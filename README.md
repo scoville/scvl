@@ -1,6 +1,6 @@
 scvl
 ===
 
-URLを短縮するサービス。
+scvl is a simple URL shortener written in go.
 
-Redisが必要。
+Redis is required.
