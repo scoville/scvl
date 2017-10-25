@@ -1,0 +1,13 @@
+body {
+  padding-top: 70px;
+  padding-bottom: 30px;
+}
+
+form.form-inline input[type="url"] {
+  width: 480px;
+  max-width: 100%;
+}
+
+.panel.panel-success {
+  margin-top: 30px;
+}
