@@ -2,13 +2,15 @@
 <div class="jumbotron">
   <h1>SCVL URL Shortener</h1>
   {{if .LoginURL}}
-    <a href="{{.LoginURL}}">ログイン</a>
+    <a href="{{.LoginURL}}" class="login btn btn-primary btn-lg">ログイン</a>
+  {{else}}
+    <p>URLの短縮ができます。</p>
+    <form action="/shorten" method="post" class="form-inline">
+      <input type="url" name="url" value="{{.URL}}" class="form-control">
+      <input type="submit" value="送信" class="btn btn-primary">
+    </form>
   {{end}}
-  <p>URLの短縮ができます。</p>
-  <form action="/shorten" method="post" class="form-inline">
-    <input type="url" name="url" value="{{.URL}}" class="form-control">
-    <input type="submit" value="送信" class="btn btn-primary">
-  </form>
+
   {{if .URL}}
     <div class="panel panel-success">
       <div class="panel-heading">
