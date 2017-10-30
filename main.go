@@ -14,6 +14,7 @@ import (
 	"github.com/gorilla/sessions"
 	"github.com/joho/godotenv"
 	"github.com/mssola/user_agent"
+	"github.com/tomasen/realip"
 )
 
 var client *redisClient
@@ -99,7 +100,8 @@ func oauthCallbackHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	if !strings.HasSuffix(u.Email, "@sc0ville.com") {
+	allowedDomain := os.Getenv("ALLOWED_DOMAIN")
+	if allowedDomain != "" && !strings.HasSuffix(u.Email, "@"+allowedDomain) {
 		http.Error(w, "ログインは、Scovilleアカウントである必要があります", http.StatusUnprocessableEntity)
 		return
 	}
@@ -152,7 +154,7 @@ func redirectHandler(w http.ResponseWriter, r *http.Request) {
 	if !ua.Bot() {
 		name, _ := ua.Browser()
 		manager.createPageView(slug, PageView{
-			RemoteAddr:  r.RemoteAddr,
+			RealIP:      realip.RealIP(r),
 			Referer:     r.Referer(),
 			Mobile:      ua.Mobile(),
 			Platform:    ua.Platform(),

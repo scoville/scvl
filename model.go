@@ -24,7 +24,7 @@ type Page struct {
 type PageView struct {
 	gorm.Model
 	PageID      int    `json:"page_id" gorm:"index"`
-	RemoteAddr  string `json:"remote_addr" gorm:"index"`
+	RealIP      string `json:"real_ip" gorm:"index"`
 	Referer     string `json:"referer" gorm:"index"`
 	Mobile      bool   `json:"mobile"`
 	Platform    string `json:"platform"`
