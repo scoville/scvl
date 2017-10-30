@@ -11,3 +11,14 @@ form.form-inline input[type="url"] {
 .panel.panel-success {
   margin-top: 30px;
 }
+
+table.urls {
+  table-layout: fixed;
+}
+.truncate {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  -webkit-text-overflow: ellipsis;
+  -o-text-overflow: ellipsis;
+  overflow: hidden;
+}
