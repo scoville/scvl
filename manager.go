@@ -37,6 +37,11 @@ func (m *Manager) findOrCreateUser(u User) (user User, err error) {
 	return
 }
 
+func (m *Manager) findPageBySlug(slug string) (page Page, err error) {
+	err = m.db.First(&page, "slug = ?", slug).Error
+	return
+}
+
 func (m *Manager) setPagesToUser(u *User) (err error) {
 	var pages []*Page
 	err = m.db.

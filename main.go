@@ -147,8 +147,14 @@ func redirectHandler(w http.ResponseWriter, r *http.Request) {
 	slug := mux.Vars(r)["slug"]
 	url := client.GetURL(slug)
 	if url == "" {
-		http.Error(w, "The URL you are looking for is not found.", http.StatusNotFound)
-		return
+		// Redisでページが見つからなかった場合の処理
+		page, err := manager.findPageBySlug(slug)
+		if err != nil {
+			http.Error(w, "The URL you are looking for is not found.", http.StatusNotFound)
+			return
+		}
+		url = page.URL
+		client.SetURL(slug, url)
 	}
 	ua := user_agent.New(r.UserAgent())
 	if !ua.Bot() {
