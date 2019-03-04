@@ -6,6 +6,7 @@ import (
 	"math/rand"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -14,6 +15,7 @@ import (
 	"github.com/gorilla/sessions"
 	"github.com/joho/godotenv"
 	"github.com/mssola/user_agent"
+	qrcode "github.com/skip2/go-qrcode"
 	"github.com/tomasen/realip"
 )
 
@@ -46,6 +48,7 @@ func setupRoutes() {
 	r.Handle("/shorten", authenticate(shortenHandler)).Methods("POST")
 	r.Handle("/", authenticate(rootHandler)).Methods("GET")
 
+	r.HandleFunc("/{slug}/qr.png", qrHandler).Methods("GET")
 	r.HandleFunc("/{slug}", redirectHandler).Methods("GET")
 	r.HandleFunc("/oauth/google/callback", oauthCallbackHandler).Methods("GET")
 	http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("css/"))))
@@ -169,4 +172,19 @@ func redirectHandler(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
+}
+
+func qrHandler(w http.ResponseWriter, r *http.Request) {
+	png, err := qrcode.Encode(strings.Split(r.RequestURI, "/qr.png")[0], qrcode.Medium, 256)
+	if err != nil {
+		log.Println("Failed to generate QR code: ", err)
+		http.Error(w, "Failed to generate QR code", http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "image/jpeg")
+	w.Header().Set("Content-Length", strconv.Itoa(len(png)))
+	if _, err := w.Write(png); err != nil {
+		log.Println("Unable to write image: ", err)
+		http.Error(w, "Unable to write image", http.StatusInternalServerError)
+	}
 }

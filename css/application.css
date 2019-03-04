@@ -26,3 +26,6 @@ table.urls {
   -o-text-overflow: ellipsis;
   overflow: hidden;
 }
+.qr img{
+  height: 88px;
+}

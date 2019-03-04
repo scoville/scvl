@@ -29,12 +29,18 @@
     <tr>
       <th width="80">短縮URL</th>
       <th>リダイレクト先URL</th>
+      <th width="100">QRコード</th>
       <th width="100">クリック数</th>
     </tr>
     {{range .User.Pages}}
       <tr>
         <td><a href="/{{.Slug}}" target="_blank">/{{.Slug}}</a></td>
         <td class="truncate"><a href="{{.URL}}" target="_blank">{{.URL}}</a></td>
+        <td class="qr">
+          <a href="/{{.Slug}}/qr.png" target="_blank">
+            <img src="/{{.Slug}}/qr.png">
+          </a>
+        </td>
         <td>{{.ViewCount}}</td>
       </tr>
     {{end}}
