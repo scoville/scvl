@@ -14,6 +14,7 @@ require (
 	github.com/jinzhu/gorm v0.0.0-20160404144928-5174cc5c242a
 	github.com/jinzhu/inflection v0.0.0-20170102125226-1c35d901db3d
 	github.com/joho/godotenv v1.2.0
+	github.com/lib/pq v1.0.0 // indirect
 	github.com/mssola/user_agent v0.4.1
 	github.com/skip2/go-qrcode v0.0.0-20190110000554-dc11ecdae0a9
 	github.com/tomasen/realip v0.0.0-20150926082420-15489afd3be3

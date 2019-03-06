@@ -83,7 +83,7 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 	bytes, _ := getFlash(w, r, "url_slug")
 	resp := map[string]interface{}{}
 	if bytes != nil {
-		json.Unmarshal(bytes, resp)
+		json.Unmarshal(bytes, &resp)
 	}
 	user, ok := context.Get(r, "user").(*User)
 	if ok {

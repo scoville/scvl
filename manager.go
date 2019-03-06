@@ -4,8 +4,8 @@ import (
 	"log"
 	"os"
 
-	_ "github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/postgres"
 )
 
 // Manager はデータベースとやり取りをします
@@ -16,7 +16,7 @@ type Manager struct {
 var manager *Manager
 
 func setupManager() {
-	db, err := gorm.Open("mysql", os.Getenv("DB_URL"))
+	db, err := gorm.Open("postgres", os.Getenv("DB_URL"))
 	if err != nil {
 		log.Fatal(err.Error())
 	}
