@@ -1,6 +1,8 @@
 package main
 
 import (
+	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"log"
 	"math/rand"
@@ -78,7 +80,11 @@ func authenticate(h http.HandlerFunc) http.HandlerFunc {
 }
 
 func rootHandler(w http.ResponseWriter, r *http.Request) {
+	bytes, _ := getFlash(w, r, "url_slug")
 	resp := map[string]interface{}{}
+	if bytes != nil {
+		json.Unmarshal(bytes, resp)
+	}
 	user, ok := context.Get(r, "user").(*User)
 	if ok {
 		manager.setPagesToUser(user)
@@ -119,31 +125,25 @@ func oauthCallbackHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func shortenHandler(w http.ResponseWriter, r *http.Request) {
-	resp := map[string]interface{}{}
 	user, ok := context.Get(r, "user").(*User)
-	if ok {
-		resp["User"] = user
-	} else {
+	if !ok {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
 	url := r.FormValue("url")
 	slug := generateSlug()
-	client.SetURL(slug, url)
 	err := manager.createPage(user.ID, slug, url)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	manager.setPagesToUser(user)
-
-	loginURL, ok := context.Get(r, "login_url").(string)
-	if ok {
-		resp["LoginURL"] = loginURL
-	}
-	resp["URL"] = url
-	resp["Slug"] = slug
-	renderTemplate(w, r, "/index.tpl", resp)
+	client.SetURL(slug, url)
+	bytes, _ := json.Marshal(map[string]string{
+		"URL":  url,
+		"Slug": slug,
+	})
+	setFlash(w, "url_slug", bytes)
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
 func redirectHandler(w http.ResponseWriter, r *http.Request) {
@@ -187,4 +187,28 @@ func qrHandler(w http.ResponseWriter, r *http.Request) {
 		log.Println("Unable to write image: ", err)
 		http.Error(w, "Unable to write image", http.StatusInternalServerError)
 	}
+}
+
+func setFlash(w http.ResponseWriter, name string, value []byte) {
+	c := &http.Cookie{Name: name, Value: base64.URLEncoding.EncodeToString(value)}
+	http.SetCookie(w, c)
+}
+
+func getFlash(w http.ResponseWriter, r *http.Request, name string) ([]byte, error) {
+	c, err := r.Cookie(name)
+	if err != nil {
+		switch err {
+		case http.ErrNoCookie:
+			return nil, nil
+		default:
+			return nil, err
+		}
+	}
+	value, err := base64.URLEncoding.DecodeString(c.Value)
+	if err != nil {
+		return nil, err
+	}
+	dc := &http.Cookie{Name: name, MaxAge: -1, Expires: time.Unix(1, 0)}
+	http.SetCookie(w, dc)
+	return value, nil
 }

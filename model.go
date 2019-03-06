@@ -13,8 +13,8 @@ type User struct {
 // Page is a page
 type Page struct {
 	gorm.Model
-	UserID    int        `json:"user_id" gorm:"index"`
-	Slug      string     `json:"slug" gorm:"index"`
+	UserID    int        `json:"user_id" gorm:"index; not null"`
+	Slug      string     `json:"slug" gorm:"unique_index; not null"`
 	URL       string     `json:"url"`
 	Views     []PageView `json:"views"`
 	ViewCount uint       `json:"view_count" gorm:"-"`
