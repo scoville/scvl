@@ -47,12 +47,14 @@ func main() {
 func setupRoutes() {
 	r := mux.NewRouter()
 
-	r.Handle("/shorten", authenticate(shortenHandler)).Methods("POST")
-	r.Handle("/", authenticate(rootHandler)).Methods("GET")
+	r.Handle("/shorten", authenticate(shortenHandler)).Methods(http.MethodPost)
+	r.Handle("/", authenticate(rootHandler)).Methods(http.MethodGet)
 
-	r.HandleFunc("/{slug}/qr.png", qrHandler).Methods("GET")
-	r.HandleFunc("/{slug}", redirectHandler).Methods("GET")
-	r.HandleFunc("/oauth/google/callback", oauthCallbackHandler).Methods("GET")
+	r.HandleFunc("/{slug}/qr.png", qrHandler).Methods(http.MethodGet)
+	r.Handle("/{slug}/edit", authenticate(editHandler)).Methods(http.MethodGet)
+	r.HandleFunc("/{slug}", redirectHandler).Methods(http.MethodGet)
+	r.HandleFunc("/{slug}", authenticate(updateHandler)).Methods(http.MethodPost, http.MethodPut, http.MethodPatch)
+	r.HandleFunc("/oauth/google/callback", oauthCallbackHandler).Methods(http.MethodGet)
 	http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("css/"))))
 	http.Handle("/", r)
 }
@@ -189,8 +191,69 @@ func qrHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func editHandler(w http.ResponseWriter, r *http.Request) {
+	bytes, _ := getFlash(w, r, "message")
+	resp := map[string]interface{}{}
+	if bytes != nil {
+		json.Unmarshal(bytes, &resp)
+	}
+
+	user, ok := context.Get(r, "user").(*User)
+	if !ok {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	slug := mux.Vars(r)["slug"]
+	page, err := manager.findPageBySlug(slug)
+	if err != nil {
+		http.Error(w, "The page you are looking for is not found.", http.StatusNotFound)
+		return
+	}
+
+	if page.UserID != int(user.ID) {
+		http.Error(w, "You don't have permission to edit it.", http.StatusUnauthorized)
+		return
+	}
+
+	resp["Page"] = page
+	renderTemplate(w, r, "/edit.tpl", resp)
+}
+
+func updateHandler(w http.ResponseWriter, r *http.Request) {
+	user, ok := context.Get(r, "user").(*User)
+	if !ok {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	slug := mux.Vars(r)["slug"]
+	page, err := manager.findPageBySlug(slug)
+	if err != nil {
+		http.Error(w, "The page you are looking for is not found.", http.StatusNotFound)
+		return
+	}
+
+	if page.UserID != int(user.ID) {
+		http.Error(w, "You don't have permission to edit it.", http.StatusUnauthorized)
+		return
+	}
+
+	url := r.FormValue("url")
+	if err := manager.updatePage(page.ID, url); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	client.SetURL(slug, url)
+	bytes, _ := json.Marshal(map[string]string{
+		"Success": "Update succeeded.",
+	})
+	setFlash(w, "message", bytes)
+	http.Redirect(w, r, "/" + slug + "/edit", http.StatusSeeOther)
+}
+
 func setFlash(w http.ResponseWriter, name string, value []byte) {
-	c := &http.Cookie{Name: name, Value: base64.URLEncoding.EncodeToString(value)}
+	c := &http.Cookie{Path: "/", Name: name, Value: base64.URLEncoding.EncodeToString(value)}
 	http.SetCookie(w, c)
 }
 
@@ -208,7 +271,7 @@ func getFlash(w http.ResponseWriter, r *http.Request, name string) ([]byte, erro
 	if err != nil {
 		return nil, err
 	}
-	dc := &http.Cookie{Name: name, MaxAge: -1, Expires: time.Unix(1, 0)}
+	dc := &http.Cookie{Path: "/", Name: name, MaxAge: -1, Expires: time.Unix(1, 0)}
 	http.SetCookie(w, dc)
 	return value, nil
 }

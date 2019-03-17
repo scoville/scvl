@@ -66,12 +66,11 @@ func (m *Manager) createPage(userID uint, slug, url string) (err error) {
 	}).Error
 }
 
-func (m *Manager) updatePage(id int, slug, url string) (err error) {
-	return m.db.
+func (m *Manager) updatePage(id uint, url string) (err error) {
+	return m.db.Table("pages").
 		Where("id = ?", id).
 		Update(&Page{
-			Slug: slug,
-			URL:  url,
+			URL: url,
 		}).Error
 }
 

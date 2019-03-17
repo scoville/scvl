@@ -31,6 +31,7 @@
       <th>リダイレクト先URL</th>
       <th width="100">QRコード</th>
       <th width="100">クリック数</th>
+      <th width="100">編集</th>
     </tr>
     {{range .User.Pages}}
       <tr>
@@ -42,6 +43,9 @@
           </a>
         </td>
         <td>{{.ViewCount}}</td>
+        <td>
+          <a href="/{{.Slug}}/edit" class="btn btn-default">編集</a>
+        </td>
       </tr>
     {{end}}
   </table>
