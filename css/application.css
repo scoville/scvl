@@ -3,7 +3,7 @@ body {
   padding-bottom: 30px;
 }
 
-form.form-inline input[type="url"] {
+.form-inline input[type="url"] {
   width: 480px;
   max-width: 100%;
 }
@@ -66,4 +66,16 @@ input#shortenUrl {
 
 .copy i {
   cursor: pointer;
+}
+
+.toggle-ogp {
+  margin: 12px 0;
+}
+
+.toggle-ogp input {
+  margin-right: 8px;
+}
+
+.ogp-information {
+  display: none;
 }

@@ -5,9 +5,28 @@
     <a href="{{.LoginURL}}" class="login btn btn-primary btn-lg">ログイン</a>
   {{else}}
     <p>URLの短縮ができます。</p>
-    <form action="/shorten" method="post" class="form-inline">
-      <input type="url" name="url" value="{{.URL}}" class="form-control">
-      <input type="submit" value="送信" class="btn btn-primary">
+    <form action="/shorten" method="post">
+      <div class="form-inline">
+        <input id="url" type="url" name="url" value="{{.URL}}" class="form-control">
+        <input type="submit" value="送信" class="btn btn-primary">
+      </div>
+      <label class="toggle-ogp">
+        <input id="ogp" type="checkbox" name="ogp">OGPをカスタマイズ（実験中）
+      </label>
+      <div class="ogp-information">
+        <div class="form-group">
+          <label for="title">タイトル</label>
+          <input class="ogp form-control" type="text" name="title" value="">
+        </div>
+        <div class="form-group">
+          <label for="title">画像URL</label>
+          <input class="ogp form-control" type="url" name="image" value="">
+        </div>
+        <div class="form-group">
+          <label for="title">説明文</label>
+          <input class="ogp form-control" type="text" name="description" value="">
+        </div>
+      </div>
     </form>
   {{end}}
 

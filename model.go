@@ -20,6 +20,15 @@ type Page struct {
 	ViewCount uint       `json:"view_count" gorm:"-"`
 }
 
+// OGP is the struct
+type OGP struct {
+	CanonicalURL string  `json:"canonical_url"`
+	Description  string  `json:"description"`
+	Image        *string `json:"image"`
+	Title        string  `json:"title"`
+	URL          string  `json:"url"`
+}
+
 // PageView is a pageview
 type PageView struct {
 	gorm.Model
