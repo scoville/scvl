@@ -139,12 +139,31 @@ func shortenHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	url := r.FormValue("url")
+	if url == "" {
+		http.Error(w, "url cannot be empty", http.StatusUnprocessableEntity)
+		return
+	}
+
 	slug := generateSlug()
-	err := manager.createPage(user.ID, slug, url)
+	page, err := manager.createPage(user.ID, slug, url)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	if r.FormValue("ogp") == "on" {
+		err = manager.createOGP(OGP{
+			PageID:      int(page.ID),
+			Description: r.FormValue("description"),
+			Image:       r.FormValue("image"),
+			Title:       r.FormValue("title"),
+		})
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	}
+
 	client.SetURL(slug, url)
 	bytes, _ := json.Marshal(map[string]string{
 		"URL":  url,
@@ -223,6 +242,9 @@ func editHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	resp["Page"] = page
+	if page.OGP != nil {
+		resp["OGP"] = true
+	}
 	renderTemplate(w, r, "/edit.tpl", resp)
 }
 
@@ -246,16 +268,46 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	url := r.FormValue("url")
+	if url == "" {
+		http.Error(w, "url cannot be empty", http.StatusUnprocessableEntity)
+		return
+	}
 	if err := manager.updatePage(page.ID, url); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	client.SetURL(slug, url)
+	if r.FormValue("ogp") == "on" {
+		if page.OGP == nil {
+			err = manager.createOGP(OGP{
+				PageID:      int(page.ID),
+				Description: r.FormValue("description"),
+				Image:       r.FormValue("image"),
+				Title:       r.FormValue("title"),
+			})
+		} else {
+			err = manager.updateOGP(page.OGP.ID, OGP{
+				Description: r.FormValue("description"),
+				Image:       r.FormValue("image"),
+				Title:       r.FormValue("title"),
+			})
+		}
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	} else if page.OGP != nil {
+		err = manager.deleteOGP(page.OGP.ID)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	}
 	bytes, _ := json.Marshal(map[string]string{
 		"Success": "Update succeeded.",
 	})
 	setFlash(w, "message", bytes)
-	http.Redirect(w, r, "/" + slug + "/edit", http.StatusSeeOther)
+	http.Redirect(w, r, "/"+slug+"/edit", http.StatusSeeOther)
 }
 
 func setFlash(w http.ResponseWriter, name string, value []byte) {

@@ -20,10 +20,11 @@ func setupManager() {
 	if err != nil {
 		log.Fatal(err.Error())
 	}
-	db.AutoMigrate(&User{}, &Page{}, &PageView{})
+	db.AutoMigrate(&User{}, &Page{}, &PageView{}, &OGP{})
 	manager = &Manager{db}
 }
 
+// users
 func (m *Manager) findUser(id uint) (user User, err error) {
 	err = m.db.First(&user, id).Error
 	return
@@ -37,8 +38,11 @@ func (m *Manager) findOrCreateUser(u User) (user User, err error) {
 	return
 }
 
+// pages
 func (m *Manager) findPageBySlug(slug string) (page Page, err error) {
-	err = m.db.First(&page, "slug = ?", slug).Error
+	err = m.db.Table("pages").
+		Preload("OGP").
+		First(&page, "slug = ?", slug).Error
 	return
 }
 
@@ -47,6 +51,7 @@ func (m *Manager) setPagesToUser(u *User) (err error) {
 	err = m.db.
 		Where(Page{UserID: int(u.ID)}).
 		Order("created_at DESC").
+		Preload("OGP").
 		Find(&pages).Error
 	if err != nil {
 		return
@@ -58,12 +63,14 @@ func (m *Manager) setPagesToUser(u *User) (err error) {
 	return
 }
 
-func (m *Manager) createPage(userID uint, slug, url string) (err error) {
-	return m.db.Create(&Page{
+func (m *Manager) createPage(userID uint, slug, url string) (page Page, err error) {
+	page = Page{
 		UserID: int(userID),
 		Slug:   slug,
 		URL:    url,
-	}).Error
+	}
+	err = m.db.Create(&page).Error
+	return
 }
 
 func (m *Manager) updatePage(id uint, url string) (err error) {
@@ -74,6 +81,23 @@ func (m *Manager) updatePage(id uint, url string) (err error) {
 		}).Error
 }
 
+// ogps
+func (m *Manager) createOGP(ogp OGP) (err error) {
+	return m.db.Create(&ogp).Error
+}
+
+func (m *Manager) updateOGP(id uint, ogp OGP) (err error) {
+	return m.db.Table("ogps").
+		Where("id = ?", id).
+		Update(&ogp).Error
+}
+
+func (m *Manager) deleteOGP(id uint) (err error) {
+	return m.db.Table("ogps").
+		Delete(OGP{}, "id = ?", id).Error
+}
+
+// page_views
 func (m *Manager) createPageView(slug string, pv PageView) (err error) {
 	var page Page
 	err = m.db.Where(&Page{Slug: slug}).First(&page).Error

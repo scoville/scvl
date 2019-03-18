@@ -11,6 +11,9 @@ $(function(){
         }, 3000)
     });
 
+    if($('#ogp')[0] && $('#ogp')[0].checked) {
+        $('.ogp-information').show();
+    }
     $('#ogp').on('change', function() {
         if(this.checked) {
             $('.ogp-information').show();
