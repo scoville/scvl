@@ -27,3 +27,17 @@ func findTemplate(basePath, path string) (tpl *template.Template) {
 	templates[path] = tpl
 	return
 }
+
+func findTemplateWithoutBase(path string) (tpl *template.Template) {
+	if config.env == envDev {
+		tpl = template.Must(template.ParseFiles(config.baseTplPath + path))
+		return
+	}
+	tpl, ok := templates[path]
+	if ok {
+		return
+	}
+	tpl = template.Must(template.ParseFiles(config.baseTplPath + path))
+	templates[path] = tpl
+	return
+}

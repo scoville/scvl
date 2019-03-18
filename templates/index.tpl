@@ -11,7 +11,7 @@
         <input type="submit" value="送信" class="btn btn-primary">
       </div>
       <label class="toggle-ogp">
-        <input id="ogp" type="checkbox" name="ogp">OGPをカスタマイズ（実験中）
+        <input id="ogp" type="checkbox" name="ogp">OGPをカスタマイズ
       </label>
       <div class="ogp-information">
         <div class="form-group">

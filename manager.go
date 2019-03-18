@@ -82,8 +82,16 @@ func (m *Manager) updatePage(id uint, url string) (err error) {
 }
 
 // ogps
-func (m *Manager) createOGP(ogp OGP) (err error) {
-	return m.db.Create(&ogp).Error
+func (m *Manager) findOGPByID(id int) (ogp *OGP, err error) {
+	ogp = &OGP{}
+	err = m.db.Table("ogps").
+		Where("id = ?", id).
+		First(&ogp).Error
+	return
+}
+
+func (m *Manager) createOGP(ogp *OGP) (err error) {
+	return m.db.Create(ogp).Error
 }
 
 func (m *Manager) updateOGP(id uint, ogp OGP) (err error) {

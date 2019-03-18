@@ -12,7 +12,7 @@
         <input id="url" type="url" name="url" value="{{.Page.URL}}" class="form-control">
     </div>
     <label class="toggle-ogp">
-        <input id="ogp" type="checkbox" name="ogp"{{if .OGP}} checked{{end}}>OGPをカスタマイズ（実験中）
+        <input id="ogp" type="checkbox" name="ogp"{{if .OGP}} checked{{end}}>OGPをカスタマイズ
     </label>
     <div class="ogp-information">
         <div class="form-group">

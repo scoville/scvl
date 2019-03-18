@@ -1,0 +1,22 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{{.OGP.Title}}</title>
+    <meta name="description" content="{{.OGP.Description}}">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="{{.OGP.Title}}">
+    <meta property="og:image" content="{{.OGP.Image}}">
+    <meta property="og:description" content="{{.OGP.Description}}">
+    <meta http-equiv="refresh" content="0;URL='{{.URL}}'">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="{{.OGP.Image}}">
+    <script>
+        location.href="{{.URL}}";
+    </script>
+</head>
+<body>
+    <p>下記URLにリダイレクトします。自動でリダイレクトしない場合は手動でクリックしてください</p>
+    <a href="{{.URL}}">{{.URL}}</a>
+</body>
+</html>

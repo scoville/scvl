@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -152,12 +151,14 @@ func shortenHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.FormValue("ogp") == "on" {
-		err = manager.createOGP(OGP{
+		ogp := OGP{
 			PageID:      int(page.ID),
 			Description: r.FormValue("description"),
 			Image:       r.FormValue("image"),
 			Title:       r.FormValue("title"),
-		})
+		}
+		err = manager.createOGP(&ogp)
+		client.SetOGPID(page.Slug, int(ogp.ID))
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -176,6 +177,7 @@ func shortenHandler(w http.ResponseWriter, r *http.Request) {
 func redirectHandler(w http.ResponseWriter, r *http.Request) {
 	slug := mux.Vars(r)["slug"]
 	url := client.GetURL(slug)
+	var ogp *OGP
 	if url == "" {
 		// Redisでページが見つからなかった場合の処理
 		page, err := manager.findPageBySlug(slug)
@@ -185,6 +187,10 @@ func redirectHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		url = page.URL
 		client.SetURL(slug, url)
+		if page.OGP != nil {
+			ogp = page.OGP
+			client.SetOGPID(slug, int(page.OGP.ID))
+		}
 	}
 	ua := user_agent.New(r.UserAgent())
 	if !ua.Bot() {
@@ -197,6 +203,24 @@ func redirectHandler(w http.ResponseWriter, r *http.Request) {
 			OS:          ua.OS(),
 			BrowserName: name,
 		})
+	}
+	var ogpID int
+	if ogp == nil {
+		ogpID = client.GetOGPID(slug)
+	}
+	if ogpID != 0 {
+		if ogp == nil {
+			ogp, _ = manager.findOGPByID(ogpID)
+		}
+		if ogp != nil {
+			data := map[string]interface{}{
+				"URL": url,
+				"OGP": ogp,
+			}
+			tpl := findTemplateWithoutBase("/redirect.tpl")
+			tpl.Execute(w, data)
+			return
+		}
 	}
 	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 }
@@ -278,25 +302,31 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	client.SetURL(slug, url)
 	if r.FormValue("ogp") == "on" {
+		var ogpID int
 		if page.OGP == nil {
-			err = manager.createOGP(OGP{
+			ogp := OGP{
 				PageID:      int(page.ID),
 				Description: r.FormValue("description"),
 				Image:       r.FormValue("image"),
 				Title:       r.FormValue("title"),
-			})
+			}
+			err = manager.createOGP(&ogp)
+			ogpID = int(ogp.ID)
 		} else {
 			err = manager.updateOGP(page.OGP.ID, OGP{
 				Description: r.FormValue("description"),
 				Image:       r.FormValue("image"),
 				Title:       r.FormValue("title"),
 			})
+			ogpID = int(page.OGP.ID)
 		}
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+		client.SetOGPID(page.Slug, ogpID)
 	} else if page.OGP != nil {
+		client.DeleteOGPID(page.Slug)
 		err = manager.deleteOGP(page.OGP.ID)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -308,28 +338,4 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 	})
 	setFlash(w, "message", bytes)
 	http.Redirect(w, r, "/"+slug+"/edit", http.StatusSeeOther)
-}
-
-func setFlash(w http.ResponseWriter, name string, value []byte) {
-	c := &http.Cookie{Path: "/", Name: name, Value: base64.URLEncoding.EncodeToString(value)}
-	http.SetCookie(w, c)
-}
-
-func getFlash(w http.ResponseWriter, r *http.Request, name string) ([]byte, error) {
-	c, err := r.Cookie(name)
-	if err != nil {
-		switch err {
-		case http.ErrNoCookie:
-			return nil, nil
-		default:
-			return nil, err
-		}
-	}
-	value, err := base64.URLEncoding.DecodeString(c.Value)
-	if err != nil {
-		return nil, err
-	}
-	dc := &http.Cookie{Path: "/", Name: name, MaxAge: -1, Expires: time.Unix(1, 0)}
-	http.SetCookie(w, dc)
-	return value, nil
 }
