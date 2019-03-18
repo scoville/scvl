@@ -8,6 +8,7 @@ import (
 var templates = map[string]*template.Template{}
 
 func renderTemplate(w http.ResponseWriter, r *http.Request, path string, data map[string]interface{}) {
+	data["Revision"] = revision
 	tpl := findTemplate("/layouts.tpl", path)
 	tpl.ExecuteTemplate(w, "base", data)
 }

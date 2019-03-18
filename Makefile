@@ -19,7 +19,7 @@ deploy:
 	GOOS=linux GOARCH=amd64 go build -ldflags "$(LDFLAGS)" -o bin/scvl
 
 	ssh scvl0001w "supervisorctl stop scvl"
-	scp -r bin css templates scvl0001w:/home/ec2-user/scvl/
+	scp -r bin css js templates scvl0001w:/home/ec2-user/scvl/
 	ssh scvl0001w "supervisorctl start scvl"
 
 # Show help

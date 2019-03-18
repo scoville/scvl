@@ -21,6 +21,11 @@ import (
 	"github.com/tomasen/realip"
 )
 
+// build flags
+var (
+	revision string
+)
+
 var client *redisClient
 var store *sessions.CookieStore
 
@@ -56,6 +61,7 @@ func setupRoutes() {
 	r.HandleFunc("/{slug}", authenticate(updateHandler)).Methods(http.MethodPost, http.MethodPut, http.MethodPatch)
 	r.HandleFunc("/oauth/google/callback", oauthCallbackHandler).Methods(http.MethodGet)
 	http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("css/"))))
+	http.Handle("/js/", http.StripPrefix("/js/", http.FileServer(http.Dir("js/"))))
 	http.Handle("/", r)
 }
 

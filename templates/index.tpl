@@ -18,7 +18,13 @@
       </div>
       <div class="panel-body">
         <p>短縮結果:</p>
-        <p><script>document.write(location.origin)</script>/{{.Slug}}</p>
+        <p>
+          <input id="shortenUrl" type="text" value="{{.Slug}}" readonly>
+          <span class="copy">
+            <i class="material-icons">content_copy</i>
+            <span class="hint">コピーする</span>
+          </span>
+        </p>
       </div>
     </div>
   {{end}}
