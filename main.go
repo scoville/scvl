@@ -208,7 +208,7 @@ func redirectHandler(w http.ResponseWriter, r *http.Request) {
 	if ogp == nil {
 		ogpID = client.GetOGPID(slug)
 	}
-	if ogpID != 0 {
+	if ogpID != 0 || ogp != nil {
 		if ogp == nil {
 			ogp, _ = manager.findOGPByID(ogpID)
 		}
