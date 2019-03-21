@@ -11,9 +11,9 @@ setup:
 	go get golang.org/x/tools/cmd/goimports
 	go get github.com/Songmu/make2help/cmd/make2help
 
-# Install dependencies
-deps: setup
-	dep ensure -update
+run:
+	go build -o bin/scvl_dev
+	bin/scvl_dev
 
 deploy:
 	GOOS=linux GOARCH=amd64 go build -ldflags "$(LDFLAGS)" -o bin/scvl

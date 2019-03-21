@@ -10,6 +10,31 @@
         <input id="url" type="url" name="url" value="{{.URL}}" class="form-control">
         <input type="submit" value="送信" class="btn btn-primary">
       </div>
+      <label class="toggle-utm">
+        <input id="utm" type="checkbox" name="utm">トラッキング用パラメータの追加
+      </label>
+      <div class="utm-information">
+        <div class="form-group">
+          <label for="utm_source">【必須】utm_source（媒体名）</label>
+          <input class="form-control" type="text" name="utm_source" value="" placeholder="google, facebook, line など">
+        </div>
+        <div class="form-group">
+          <label for="utm_medium">【必須】utm_medium（メディアの種類）</label>
+          <select class="form-control" name="utm_medium">
+            <option value="-"></option>
+            <option value="paidsearch">paidsearch（有料検索）</option>
+            <option value="display">display（ディスプレイ広告）</option>
+            <option value="affiliate">affiliate（その他の広告）</option>
+            <option value="social">social（SNS）</option>
+            <option value="email">email（メール）</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="utm_campaign">【任意】utm_campaign(キャンペーン名)</label>
+          <input class="form-control" type="text" name="utm_campaign" value="" placeholder="spring_sale など">
+        </div>
+      </div>
+
       <label class="toggle-ogp">
         <input id="ogp" type="checkbox" name="ogp">OGPをカスタマイズ
       </label>

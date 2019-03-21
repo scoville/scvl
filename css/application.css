@@ -68,14 +68,15 @@ input#shortenUrl {
   cursor: pointer;
 }
 
-.toggle-ogp {
+.toggle-utm, .toggle-ogp {
+  display: block;
   margin: 12px 0;
 }
 
-.toggle-ogp input {
+.toggle-utm input, .toggle-ogp input {
   margin-right: 8px;
 }
 
-.ogp-information {
+.utm-information, .ogp-information {
   display: none;
 }
