@@ -1,9 +1,10 @@
-package main
+package google
 
 import (
 	"encoding/json"
 	"os"
 
+	"github.com/scoville/scvl/src/domain"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 )
@@ -23,7 +24,7 @@ func setupGoogleConfig() {
 	}
 }
 
-func fetchUserInfo(code string) (user User, err error) {
+func fetchUserInfo(code string) (user domain.User, err error) {
 	tok, err := googleConfig.Exchange(oauth2.NoContext, code)
 	if err != nil {
 		return

@@ -73,6 +73,9 @@
     </div>
   {{end}}
 </div>
+
+<a href="/files">ファイルアップロードはこちら（実験中）</a>
+
 {{if .User}}
   <h2>{{.User.Name}}の短縮したURL一覧</h2>
   <table class="table urls">
