@@ -42,6 +42,7 @@ func (e *Engine) UploadFile(req UploadFileRequest) (file *domain.File, err error
 		Slug:              slug,
 		Deadline:          deadline,
 		Path:              path,
+		DownloadLimit:     req.DownloadLimit,
 	}
 	err = e.sqlClient.CreateFile(file)
 	return

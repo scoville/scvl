@@ -15,6 +15,7 @@ type File struct {
 	Slug              string     `json:"slug" gorm:"unique_index; not null"`
 	Deadline          *time.Time `json:"deadline"`
 	Path              string     `json:"path"`
+	DownloadLimit     int        `json:"download_limit"`
 
 	Downloads     []FileDownload `json:"file_downloads"`
 	DownloadCount uint           `json:"download_count" gorm:"-"`
