@@ -2,6 +2,7 @@ package web
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -34,6 +35,7 @@ func (web *Web) fileUploadHandler(w http.ResponseWriter, r *http.Request) {
 
 	user, ok := context.Get(r, "user").(*domain.User)
 	if !ok {
+		log.Println("failed to get user from the context")
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}

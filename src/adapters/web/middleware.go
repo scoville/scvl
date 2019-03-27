@@ -1,6 +1,7 @@
 package web
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/gorilla/context"
@@ -14,9 +15,10 @@ func (web *Web) authenticate(h http.HandlerFunc) http.HandlerFunc {
 		if ok {
 			user, err := web.engine.FindUser(userID)
 			if err != nil {
+				log.Println("Failed to find user: " + err.Error())
 				ok = false
 			} else {
-				context.Set(r, "user", &user)
+				context.Set(r, "user", user)
 			}
 		}
 		if !ok {
