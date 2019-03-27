@@ -6,7 +6,7 @@ const testRedisDB = 999
 
 func TestRedis(t *testing.T) {
 	var err error
-	client, err = newRedisClient()
+	client, err := NewClient()
 	if err != nil {
 		t.Fatal("cannot connect to redis server")
 	}

@@ -42,5 +42,5 @@ func (web *Web) Start(port string) error {
 	http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("css/"))))
 	http.Handle("/js/", http.StripPrefix("/js/", http.FileServer(http.Dir("js/"))))
 	http.Handle("/", r)
-	return http.ListenAndServe(":8080", nil)
+	return http.ListenAndServe(port, nil)
 }

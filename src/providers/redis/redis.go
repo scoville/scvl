@@ -7,7 +7,8 @@ import (
 	"github.com/scoville/scvl/src/engine"
 )
 
-func newRedisClient() (r engine.RedisClient, err error) {
+// NewClient creates and returns redis client
+func NewClient() (r engine.RedisClient, err error) {
 	c, err := redigo.Dial("tcp", ":6379")
 	if err != nil {
 		return

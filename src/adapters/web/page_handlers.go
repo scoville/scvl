@@ -9,10 +9,10 @@ import (
 
 	"github.com/gorilla/context"
 	"github.com/gorilla/mux"
-	"github.com/tomasen/realip"
-	"github.com/skip2/go-qrcode"
 	"github.com/scoville/scvl/src/domain"
 	"github.com/scoville/scvl/src/engine"
+	qrcode "github.com/skip2/go-qrcode"
+	"github.com/tomasen/realip"
 )
 
 func (web *Web) rootHandler(w http.ResponseWriter, r *http.Request) {
@@ -38,23 +38,20 @@ func (web *Web) shortenHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
-	req := &engine.ShortenRequest{
-		UserID: int(user.ID),
-		URL: r.FormValue("url"),
-		Description: r.FormValue("description"),
-		Image:       r.FormValue("image"),
-		Title:       r.FormValue("title"),
-	}
-	if r.FormValue("ogp") == "on" {
-		req.CustomizeOGP = true
-	}
 
-	page, err := web.engine.Shorten(req)
+	page, err := web.engine.Shorten(&engine.ShortenRequest{
+		UserID:       int(user.ID),
+		URL:          r.FormValue("url"),
+		CustomizeOGP: r.FormValue("ogp") == "on",
+		Description:  r.FormValue("description"),
+		Image:        r.FormValue("image"),
+		Title:        r.FormValue("title"),
+	})
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	
+
 	bytes, _ := json.Marshal(map[string]string{
 		"URL":  page.URL,
 		"Slug": page.Slug,
@@ -65,9 +62,9 @@ func (web *Web) shortenHandler(w http.ResponseWriter, r *http.Request) {
 
 func (web *Web) redirectHandler(w http.ResponseWriter, r *http.Request) {
 	url, ogp, err := web.engine.Access(&engine.AccessRequest{
-		Slug: mux.Vars(r)["slug"],
-		RealIP:      realip.RealIP(r),
-		Referer:     r.Referer(),
+		Slug:      mux.Vars(r)["slug"],
+		RealIP:    realip.RealIP(r),
+		Referer:   r.Referer(),
 		UserAgent: r.UserAgent(),
 	})
 	if err != nil {
@@ -136,63 +133,23 @@ func (web *Web) updateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	slug := mux.Vars(r)["slug"]
-	page, err := manager.findPageBySlug(slug)
+	page, err := web.engine.UpdatePage(&engine.UpdatePageRequest{
+		Slug:         mux.Vars(r)["slug"],
+		UserID:       int(user.ID),
+		URL:          r.FormValue("url"),
+		CustomizeOGP: r.FormValue("ogp") == "on",
+		Description:  r.FormValue("description"),
+		Image:        r.FormValue("image"),
+		Title:        r.FormValue("title"),
+	})
 	if err != nil {
-		http.Error(w, "The page you are looking for is not found.", http.StatusNotFound)
+		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
 		return
 	}
 
-	if page.UserID != int(user.ID) {
-		http.Error(w, "You don't have permission to edit it.", http.StatusUnauthorized)
-		return
-	}
-
-	url := r.FormValue("url")
-	if url == "" {
-		http.Error(w, "url cannot be empty", http.StatusUnprocessableEntity)
-		return
-	}
-	if err := manager.updatePage(page.ID, url); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	client.SetURL(slug, url)
-	if r.FormValue("ogp") == "on" {
-		var ogpID int
-		if page.OGP == nil {
-			ogp := OGP{
-				PageID:      int(page.ID),
-				Description: r.FormValue("description"),
-				Image:       r.FormValue("image"),
-				Title:       r.FormValue("title"),
-			}
-			err = manager.createOGP(&ogp)
-			ogpID = int(ogp.ID)
-		} else {
-			err = manager.updateOGP(page.OGP.ID, OGP{
-				Description: r.FormValue("description"),
-				Image:       r.FormValue("image"),
-				Title:       r.FormValue("title"),
-			})
-			ogpID = int(page.OGP.ID)
-		}
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		client.SetOGPID(page.Slug, ogpID)
-	} else if page.OGP != nil {
-		client.DeleteOGPID(page.Slug)
-		err = manager.deleteOGP(page.OGP.ID)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-	}
 	bytes, _ := json.Marshal(map[string]string{
 		"Success": "Update succeeded.",
 	})
 	setFlash(w, "message", bytes)
-	http.Redirect(w, r, "/"+slug+"/edit", http.StatusSeeOther)
+	http.Redirect(w, r, "/"+page.Slug+"/edit", http.StatusSeeOther)
 }

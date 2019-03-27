@@ -112,3 +112,71 @@ func (e *Engine) Access(req *AccessRequest) (url string, ogp *domain.OGP, err er
 	}
 	return
 }
+
+// UpdatePageRequest is the request struct for UpdatePage function
+type UpdatePageRequest struct {
+	Slug         string
+	UserID       int
+	URL          string
+	CustomizeOGP bool
+	Description  string
+	Image        string
+	Title        string
+}
+
+// UpdatePage updates the page
+func (e *Engine) UpdatePage(req *UpdatePageRequest) (page *domain.Page, err error) {
+	if req.URL == "" {
+		err = errors.New("url cannot be empty")
+		return
+	}
+
+	page, err = e.sqlClient.FindPageBySlug(req.Slug)
+	if err != nil {
+		return
+	}
+
+	if page.UserID != req.UserID {
+		err = errors.New("You don't have permission to edit it")
+		return
+	}
+
+	err = e.sqlClient.UpdatePage(page, &domain.Page{URL: req.URL})
+	if err != nil {
+		return
+	}
+
+	e.redisClient.SetURL(req.Slug, req.URL)
+
+	if req.CustomizeOGP {
+		var ogpID int
+		if page.OGP == nil {
+			ogp := domain.OGP{
+				PageID:      int(page.ID),
+				Description: req.Description,
+				Image:       req.Image,
+				Title:       req.Title,
+			}
+			err = e.sqlClient.CreateOGP(&ogp)
+			ogpID = int(ogp.ID)
+		} else {
+			err = e.sqlClient.UpdateOGP(page.OGP.ID, &domain.OGP{
+				Description: req.Description,
+				Image:       req.Image,
+				Title:       req.Title,
+			})
+			ogpID = int(page.OGP.ID)
+		}
+		if err != nil {
+			return
+		}
+		e.redisClient.SetOGPID(page.Slug, ogpID)
+	} else if page.OGP != nil {
+		e.redisClient.DeleteOGPID(page.Slug)
+		err = e.sqlClient.DeleteOGP(page.OGP.ID)
+		if err != nil {
+			return
+		}
+	}
+	return
+}

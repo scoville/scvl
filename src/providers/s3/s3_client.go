@@ -8,6 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/scoville/scvl/src/engine"
 )
 
 type s3Client struct {
@@ -15,7 +16,8 @@ type s3Client struct {
 	svc      *session.Session
 }
 
-func newS3Client(s3Bucket, s3Region, id, secret string) (engine.S3Client, error) {
+// NewClient creates and returns s3Client
+func NewClient(s3Bucket, s3Region, id, secret string) (engine.S3Client, error) {
 	svc, err := session.NewSession(&aws.Config{
 		Credentials: credentials.NewStaticCredentials(id, secret, ""),
 		Region:      aws.String(s3Region),

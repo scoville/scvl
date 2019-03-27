@@ -2,6 +2,7 @@ package sql
 
 import (
 	"github.com/jinzhu/gorm"
+	"github.com/scoville/scvl/src/domain"
 	"github.com/scoville/scvl/src/engine"
 
 	// use postgres
@@ -18,6 +19,17 @@ func NewClient(dbURL string) (engine.SQLClient, error) {
 	if err != nil {
 		return nil, err
 	}
-	db.AutoMigrate(&User{}, &Page{}, &PageView{}, &OGP{}, &File{}, &FileDownload{})
+	db.AutoMigrate(
+		&domain.FileDownload{},
+		&domain.File{},
+		&domain.OGP{},
+		&domain.PageView{},
+		&domain.Page{},
+		&domain.User{},
+	)
 	return &client{db}, nil
+}
+
+func (c *client) Close() error {
+	return c.db.Close()
 }

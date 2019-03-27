@@ -23,7 +23,7 @@ func (c *client) FindUser(id uint) (user *domain.User, err error) {
 		return
 	}
 	for _, p := range user.Pages {
-		c.db.Table(tblPageviews).Where("page_id = ?", p.ID).Count(&(p.ViewCount))
+		c.db.Table(tblPageViews).Where("page_id = ?", p.ID).Count(&(p.ViewCount))
 	}
 	for _, f := range user.Files {
 		c.db.Table(tblFileDownloads).Where("file_id = ?", f.ID).Count(&(f.DownloadCount))
@@ -32,10 +32,11 @@ func (c *client) FindUser(id uint) (user *domain.User, err error) {
 	return
 }
 
-func (c *client) findOrCreateUser(params User) (user User, err error) {
+func (c *client) FindOrCreateUser(params domain.User) (user *domain.User, err error) {
+	user = &domain.User{}
 	err = c.db.
-		Where(User{Email: params.Email}).
-		Assign(User{Name: params.Name}).
-		FirstOrCreate(&user).Error
+		Where(domain.User{Email: params.Email}).
+		Assign(domain.User{Name: params.Name}).
+		FirstOrCreate(user).Error
 	return
 }

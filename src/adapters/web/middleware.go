@@ -23,7 +23,7 @@ func (web *Web) authenticate(h http.HandlerFunc) http.HandlerFunc {
 			state := domain.GenerateSlug(8)
 			session.Values["google_state"] = state
 			session.Save(r, w)
-			context.Set(r, "login_url", googleConfig.AuthCodeURL(state))
+			context.Set(r, "login_url", web.engine.AuthCodeURL(state))
 		}
 		h.ServeHTTP(w, r)
 	}

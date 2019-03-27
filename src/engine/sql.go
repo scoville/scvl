@@ -4,7 +4,10 @@ import "github.com/scoville/scvl/src/domain"
 
 // SQLClient is the interface for sql client
 type SQLClient interface {
+	Close() error
+
 	FindUser(uint) (*domain.User, error)
+	FindOrCreateUser(domain.User) (*domain.User, error)
 
 	FindPageBySlug(string) (*domain.Page, error)
 	CreatePage(*domain.Page) error
