@@ -72,8 +72,7 @@ func (web *Web) fileUploadHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	bytes, _ := json.Marshal(map[string]string{
-		"URL":  url,
-		"Slug": slug,
+		"Slug": file.Slug,
 	})
 	setFlash(w, "file_slug", bytes)
 	http.Redirect(w, r, "/files", http.StatusSeeOther)
@@ -81,20 +80,9 @@ func (web *Web) fileUploadHandler(w http.ResponseWriter, r *http.Request) {
 
 func (web *Web) fileDownloadHandler(w http.ResponseWriter, r *http.Request) {
 	slug := mux.Vars(r)["slug"]
-
-	file, err := manager.findFileBySlug(slug)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusNotFound)
-		return
-	}
 	password := r.FormValue("password")
-	if err := bcrypt.CompareHashAndPassword(
-		[]byte(file.EncryptedPassword),
-		[]byte(password)); err != nil {
-		http.Error(w, err.Error(), http.StatusUnauthorized)
-		return
-	}
-	data, err := s3Client.FetchFromS3(slug)
+
+	data, err := web.engine.DownloadFile(slug, password)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

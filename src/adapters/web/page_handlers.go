@@ -9,7 +9,10 @@ import (
 
 	"github.com/gorilla/context"
 	"github.com/gorilla/mux"
+	"github.com/tomasen/realip"
+	"github.com/skip2/go-qrcode"
 	"github.com/scoville/scvl/src/domain"
+	"github.com/scoville/scvl/src/engine"
 )
 
 func (web *Web) rootHandler(w http.ResponseWriter, r *http.Request) {
@@ -20,7 +23,6 @@ func (web *Web) rootHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	user, ok := context.Get(r, "user").(*domain.User)
 	if ok {
-		manager.setPagesToUser(user)
 		resp["User"] = user
 	}
 	loginURL, ok := context.Get(r, "login_url").(string)
@@ -36,90 +38,51 @@ func (web *Web) shortenHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
-	url := r.FormValue("url")
-	if url == "" {
-		http.Error(w, "url cannot be empty", http.StatusUnprocessableEntity)
-		return
+	req := &engine.ShortenRequest{
+		UserID: int(user.ID),
+		URL: r.FormValue("url"),
+		Description: r.FormValue("description"),
+		Image:       r.FormValue("image"),
+		Title:       r.FormValue("title"),
+	}
+	if r.FormValue("ogp") == "on" {
+		req.CustomizeOGP = true
 	}
 
-	slug := generateSlug(4)
-	page, err := manager.createPage(user.ID, slug, url)
+	page, err := web.engine.Shorten(req)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
-	if r.FormValue("ogp") == "on" {
-		ogp := OGP{
-			PageID:      int(page.ID),
-			Description: r.FormValue("description"),
-			Image:       r.FormValue("image"),
-			Title:       r.FormValue("title"),
-		}
-		err = manager.createOGP(&ogp)
-		client.SetOGPID(page.Slug, int(ogp.ID))
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-	}
-
-	client.SetURL(slug, url)
+	
 	bytes, _ := json.Marshal(map[string]string{
-		"URL":  url,
-		"Slug": slug,
+		"URL":  page.URL,
+		"Slug": page.Slug,
 	})
 	setFlash(w, "url_slug", bytes)
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
 func (web *Web) redirectHandler(w http.ResponseWriter, r *http.Request) {
-	slug := mux.Vars(r)["slug"]
-	url := client.GetURL(slug)
-	var ogp *OGP
-	if url == "" {
-		// Redisでページが見つからなかった場合の処理
-		page, err := manager.findPageBySlug(slug)
-		if err != nil {
-			http.Error(w, "The URL you are looking for is not found.", http.StatusNotFound)
-			return
-		}
-		url = page.URL
-		client.SetURL(slug, url)
-		if page.OGP != nil {
-			ogp = page.OGP
-			client.SetOGPID(slug, int(page.OGP.ID))
-		}
+	url, ogp, err := web.engine.Access(&engine.AccessRequest{
+		Slug: mux.Vars(r)["slug"],
+		RealIP:      realip.RealIP(r),
+		Referer:     r.Referer(),
+		UserAgent: r.UserAgent(),
+	})
+	if err != nil {
+		log.Println(err.Error())
+		http.Error(w, "The URL you are looking for is not found.", http.StatusNotFound)
+		return
 	}
-	ua := user_agent.New(r.UserAgent())
-	if !ua.Bot() {
-		name, _ := ua.Browser()
-		manager.createPageView(slug, PageView{
-			RealIP:      realip.RealIP(r),
-			Referer:     r.Referer(),
-			Mobile:      ua.Mobile(),
-			Platform:    ua.Platform(),
-			OS:          ua.OS(),
-			BrowserName: name,
-		})
-	}
-	var ogpID int
-	if ogp == nil {
-		ogpID = client.GetOGPID(slug)
-	}
-	if ogpID != 0 || ogp != nil {
-		if ogp == nil {
-			ogp, _ = manager.findOGPByID(ogpID)
+	if ogp != nil {
+		data := map[string]interface{}{
+			"URL": url,
+			"OGP": ogp,
 		}
-		if ogp != nil {
-			data := map[string]interface{}{
-				"URL": url,
-				"OGP": ogp,
-			}
-			tpl := findTemplateWithoutBase("/redirect.tpl")
-			tpl.Execute(w, data)
-			return
-		}
+		tpl := findTemplateWithoutBase("/redirect.tpl")
+		tpl.Execute(w, data)
+		return
 	}
 	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 }
@@ -153,14 +116,9 @@ func (web *Web) editHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	slug := mux.Vars(r)["slug"]
-	page, err := manager.findPageBySlug(slug)
+	page, err := web.engine.FindPage(slug, int(user.ID))
 	if err != nil {
 		http.Error(w, "The page you are looking for is not found.", http.StatusNotFound)
-		return
-	}
-
-	if page.UserID != int(user.ID) {
-		http.Error(w, "You don't have permission to edit it.", http.StatusUnauthorized)
 		return
 	}
 

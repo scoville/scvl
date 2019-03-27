@@ -1,26 +1,24 @@
 package sql
 
-func (c *client) findPageBySlug(slug string) (page Page, err error) {
-	err = m.db.Table("pages").
+import "github.com/scoville/scvl/src/domain"
+
+const tblPages = "pages"
+
+func (c *client) FindPageBySlug(slug string) (page *domain.Page, err error) {
+	page = &domain.Page{}
+	err = c.db.Table(tblPages).
 		Preload("OGP").
-		First(&page, "slug = ?", slug).Error
+		First(page, "slug = ?", slug).Error
 	return
 }
 
-func (c *client) createPage(userID uint, slug, url string) (page Page, err error) {
-	page = Page{
-		UserID: int(userID),
-		Slug:   slug,
-		URL:    url,
-	}
-	err = m.db.Create(&page).Error
+func (c *client) CreatePage(page *domain.Page) (err error) {
+	err = c.db.Create(page).Error
 	return
 }
 
-func (c *client) updatePage(id uint, url string) (err error) {
-	return m.db.Table("pages").
-		Where("id = ?", id).
-		Update(&Page{
-			URL: url,
-		}).Error
+func (c *client) UpdatePage(page, params *domain.Page) error {
+	return c.db.Table(tblPages).
+		Model(page).
+		Update(params).Error
 }

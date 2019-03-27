@@ -33,7 +33,7 @@ func (c *client) FindUser(id uint) (user *domain.User, err error) {
 }
 
 func (c *client) findOrCreateUser(params User) (user User, err error) {
-	err = m.db.
+	err = c.db.
 		Where(User{Email: params.Email}).
 		Assign(User{Name: params.Name}).
 		FirstOrCreate(&user).Error

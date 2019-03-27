@@ -1,4 +1,4 @@
-package main
+package redis
 
 import "testing"
 
@@ -11,7 +11,7 @@ func TestRedis(t *testing.T) {
 		t.Fatal("cannot connect to redis server")
 	}
 	defer client.Close()
-	client.setDatabase(testRedisDB)
+	client.SetDatabase(testRedisDB)
 
 	hash := "hogehoge"
 	expected := "https://en-courage.com"

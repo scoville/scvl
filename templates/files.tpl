@@ -28,7 +28,7 @@
       </div>
     </form>
   {{end}}
-  {{if .URL}}
+  {{if .Slug}}
     <div class="panel panel-success">
       <div class="panel-heading">
         <h3 class="panel-title">ファイルのアップロードが成功しました。</h3>

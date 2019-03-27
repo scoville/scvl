@@ -1,24 +1,26 @@
 package sql
 
-func (c *client) findOGPByID(id int) (ogp *OGP, err error) {
-	ogp = &OGP{}
-	err = m.db.Table("ogps").
+import "github.com/scoville/scvl/src/domain"
+
+func (c *client) FindOGPByID(id int) (ogp *domain.OGP, err error) {
+	ogp = &domain.OGP{}
+	err = c.db.Table("ogps").
 		Where("id = ?", id).
 		First(&ogp).Error
 	return
 }
 
-func (c *client) createOGP(ogp *OGP) (err error) {
-	return m.db.Create(ogp).Error
+func (c *client) CreateOGP(ogp *domain.OGP) (err error) {
+	return c.db.Create(ogp).Error
 }
 
-func (c *client) updateOGP(id uint, ogp OGP) (err error) {
-	return m.db.Table("ogps").
+func (c *client) UpdateOGP(id uint, ogp *domain.OGP) (err error) {
+	return c.db.Table("ogps").
 		Where("id = ?", id).
-		Update(&ogp).Error
+		Update(ogp).Error
 }
 
-func (c *client) deleteOGP(id uint) (err error) {
-	return m.db.Table("ogps").
-		Delete(OGP{}, "id = ?", id).Error
+func (c *client) DeleteOGP(id uint) (err error) {
+	return c.db.Table("ogps").
+		Delete(domain.OGP{}, "id = ?", id).Error
 }

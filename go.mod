@@ -25,7 +25,6 @@ require (
 	github.com/oxequa/interact v0.0.0-20171114182912-f8fb5795b5d7 // indirect
 	github.com/oxequa/realize v2.0.2+incompatible // indirect
 	github.com/satori/go.uuid v1.2.0 // indirect
-	github.com/scoville/encourage_users v0.0.0-20190326052601-d8947d182279
 	github.com/sirupsen/logrus v1.4.0 // indirect
 	github.com/skip2/go-qrcode v0.0.0-20190110000554-dc11ecdae0a9
 	github.com/tomasen/realip v0.0.0-20150926082420-15489afd3be3

@@ -1,5 +1,12 @@
 package web
 
+import (
+	"fmt"
+	"net/http"
+	"os"
+	"strings"
+)
+
 func (web *Web) oauthCallbackHandler(w http.ResponseWriter, r *http.Request) {
 	session, _ := store.Get(r, "scvl")
 	retrievedState, _ := session.Values["google_state"].(string)

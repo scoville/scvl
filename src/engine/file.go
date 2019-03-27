@@ -1,10 +1,12 @@
 package engine
 
 import (
+	"fmt"
 	"mime/multipart"
 	"time"
 
 	"github.com/scoville/scvl/src/domain"
+	"golang.org/x/crypto/bcrypt"
 )
 
 // UploadFileRequest is the request struct for the UploadFile function
@@ -19,9 +21,11 @@ type UploadFileRequest struct {
 	ValidDays     int
 }
 
-// UploadFile uploads file to S3
+// UploadFile uploads a file to S3
 func (e *Engine) UploadFile(req UploadFileRequest) (file *domain.File, err error) {
-	err = s3Client.UploadToS3(file, "test.jpg")
+	slug := domain.GenerateSlug(44)
+	path := fmt.Sprintf("%d/%s/%s", req.UserID, slug, req.FileName)
+	err = e.s3Client.Upload(req.File, path)
 	if err != nil {
 		return
 	}
@@ -32,14 +36,29 @@ func (e *Engine) UploadFile(req UploadFileRequest) (file *domain.File, err error
 		deadline = &t
 	}
 
-	err = manager.createFile(&domain.File{
-		UserID:            int(user.ID),
-		EncryptedPassword: domain.Encrypt(password),
-		Slug:              domain.GenerateSlug(44),
+	file = &domain.File{
+		UserID:            req.UserID,
+		EncryptedPassword: domain.Encrypt(req.Password),
+		Slug:              slug,
 		Deadline:          deadline,
-	})
+		Path:              path,
+	}
+	err = e.sqlClient.CreateFile(file)
+	return
+}
+
+// DownloadFile downloads a file from S3
+func (e *Engine) DownloadFile(slug, password string) (data []byte, err error) {
+	file, err := e.sqlClient.FindFileBySlug(slug)
 	if err != nil {
 		return
 	}
 
+	if err = bcrypt.CompareHashAndPassword(
+		[]byte(file.EncryptedPassword),
+		[]byte(password)); err != nil {
+		return
+	}
+
+	return e.s3Client.Download(file.Path)
 }
