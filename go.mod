@@ -3,6 +3,8 @@ module github.com/scoville/scvl
 go 1.12
 
 require (
+	cloud.google.com/go v0.36.0 // indirect
+	github.com/Songmu/make2help v0.1.0 // indirect
 	github.com/aws/aws-sdk-go v1.19.2
 	github.com/garyburd/redigo v1.6.0
 	github.com/gorilla/context v1.1.1
@@ -12,9 +14,12 @@ require (
 	github.com/jinzhu/inflection v0.0.0-20180308033659-04140366298a // indirect
 	github.com/joho/godotenv v1.3.0
 	github.com/lib/pq v1.0.0 // indirect
+	github.com/markbates/refresh v1.7.1 // indirect
+	github.com/microcosm-cc/bluemonday v1.0.2 // indirect
 	github.com/mssola/user_agent v0.5.0
 	github.com/skip2/go-qrcode v0.0.0-20190110000554-dc11ecdae0a9
 	github.com/tomasen/realip v0.0.0-20180522021738-f0c99a92ddce
 	golang.org/x/crypto v0.0.0-20190325154230-a5d413f7728c
 	golang.org/x/oauth2 v0.0.0-20190319182350-c85d3e98c914
+	golang.org/x/tools v0.0.0-20190327011446-79af862e6737 // indirect
 )

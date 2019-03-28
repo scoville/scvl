@@ -7,19 +7,19 @@
     <p>ファイルのアップロードができます。</p>
     <form action="/files" method="post" enctype="multipart/form-data">
       <div class="form-group">
-        <label for="download_limit">ダウンロード制限回数</label>
+        <label for="download_limit">ダウンロード制限回数（無制限の場合は0を指定）</label>
         <input type="number" name="download_limit" value="1" class="form-control" required />
       </div>
       <div class="form-group">
-        <label for="valid_days">ダウンロード期限（日数: 無期限の場合は0を指定）</label>
+        <label for="valid_days">ダウンロード可能日数（無期限の場合は0を指定）</label>
         <input type="number" name="valid_days" value="0" class="form-control" required />
       </div>
       <div class="form-group">
-        <label for="email">送信先メールアドレス</label>
+        <label for="email">送信先メールアドレス（任意）</label>
         <input type="email" name="email" value="" class="form-control" reuired />
       </div>
       <div class="form-group">
-        <label for="password">パスワードを設定する</label>
+        <label for="password">パスワード（任意）</label>
         <input type="password" name="password" value="" class="form-control" />
       </div>
       <input type="file" name="file" required>
@@ -52,13 +52,15 @@
   <table class="table files">
     <tr>
       <th width="80">ダウンロード用リンク</th>
-      <th width="100">ダウンロード回数</th>
+      <th width="140">ダウンロード回数 / 制限回数</th>
+      <th width="100">ダウンロード期限</th>
       <th width="100">編集</th>
     </tr>
     {{range .User.Files}}
       <tr>
         <td class="truncate"><a href="/files/{{.Slug}}" target="_blank">/files/{{.Slug}}</a></td>
-        <td>{{.DownloadCount}} / {{.DownloadLimit}}</td>
+        <td>{{.DownloadCount}}{{if ne .DownloadLimit 0}} / {{.DownloadLimit}}{{end}}</td>
+        <td>{{.FormatDeadline}}</td>
         <td>
           <a href="/files/{{.Slug}}/edit" class="btn btn-default">編集</a>
         </td>

@@ -22,5 +22,7 @@ type SQLClient interface {
 
 	FindFileBySlug(string) (*domain.File, error)
 	CreateFile(*domain.File) error
-	UpdateFile(*domain.File, domain.File) (err error)
+	UpdateFile(*domain.File, *domain.File) error
+
+	CreateFileDownload(string, *domain.FileDownload) error
 }

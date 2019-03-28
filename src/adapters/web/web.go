@@ -33,6 +33,10 @@ func (web *Web) Start(port string) error {
 	r.Handle("/", web.authenticate(web.rootHandler)).Methods(http.MethodGet)
 	r.Handle("/files", web.authenticate(web.filesHandler)).Methods(http.MethodGet)
 	r.Handle("/files", web.authenticate(web.fileUploadHandler)).Methods(http.MethodPost)
+	r.HandleFunc("/files/{slug}", web.fileShowHandler).Methods(http.MethodGet)
+	r.Handle("/files/{slug}/download", web.authenticate(web.fileDownloadHandler)).Methods(http.MethodPost)
+	r.Handle("/files/{slug}/edit", web.authenticate(web.editFileHandler)).Methods(http.MethodGet)
+	r.HandleFunc("/files/{slug}", web.authenticate(web.updateFileHandler)).Methods(http.MethodPost, http.MethodPut, http.MethodPatch)
 
 	r.HandleFunc("/{slug}/qr.png", web.qrHandler).Methods(http.MethodGet)
 	r.Handle("/{slug}/edit", web.authenticate(web.editHandler)).Methods(http.MethodGet)

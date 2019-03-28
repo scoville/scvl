@@ -4,22 +4,24 @@ package engine
 type Engine struct {
 	redisClient   RedisClient
 	sqlClient     SQLClient
-	s3Client      S3Client
+	awsClient     AWSClient
 	googleClient  GoogleClient
 	allowedDomain string
+	baseURL       string
 }
 
 // Options are meant to be passed to the New function
 type Options struct {
 	AllowedDomain string
+	BaseURL       string
 }
 
 // New creates the engine instance
-func New(redisClient RedisClient, sqlClient SQLClient, s3Client S3Client, googleClient GoogleClient, options Options) *Engine {
+func New(redisClient RedisClient, sqlClient SQLClient, awsClient AWSClient, googleClient GoogleClient, options Options) *Engine {
 	return &Engine{
 		redisClient:   redisClient,
 		sqlClient:     sqlClient,
-		s3Client:      s3Client,
+		awsClient:     awsClient,
 		googleClient:  googleClient,
 		allowedDomain: options.AllowedDomain,
 	}

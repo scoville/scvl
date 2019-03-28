@@ -13,8 +13,8 @@ func (e *Engine) FindPage(slug string, userID int) (page *domain.Page, err error
 	if err != nil {
 		return
 	}
-	if page.UserID != userID {
-		err = errors.New("You don't have permission to edit it.")
+	if userID != 0 && page.UserID != userID {
+		err = errors.New("You don't have permission to edit it")
 		return
 	}
 	return

@@ -9,7 +9,7 @@ ignored_folders:
 included_extensions:
 - .go
 build_target_path: ""
-build_path: /var/folders/d1/x8mdfgy96mdccp1tlzqttqmm0000gn/T/
+build_path: ./bin/
 build_flags: []
 build_delay: 200ns
 binary_name: refresh-build
