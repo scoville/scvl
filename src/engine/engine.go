@@ -24,5 +24,6 @@ func New(redisClient RedisClient, sqlClient SQLClient, awsClient AWSClient, goog
 		awsClient:     awsClient,
 		googleClient:  googleClient,
 		allowedDomain: options.AllowedDomain,
+		baseURL:       options.BaseURL,
 	}
 }
