@@ -48,3 +48,8 @@ func (f *File) FormatDeadline() string {
 	jst := time.FixedZone("Asia/Tokyo", 9*60*60)
 	return f.Deadline.In(jst).Format("2006/01/02 15:04")
 }
+
+// RemainingDownloadableCount returns remaining downloadable count for the file
+func (f *File) RemainingDownloadableCount() int {
+	return f.DownloadLimit - int(f.DownloadCount)
+}

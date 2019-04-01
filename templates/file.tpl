@@ -9,6 +9,23 @@
 {{if .Downloadable}}
     <h1>ファイルのダウンロード</h1>
     <form action="/files/{{.File.Slug}}/download" method="post">
+        <p class="mt20">以下のファイルをダウンロードします。</p>
+        <table class="table mt20">
+            <tr>
+                <th width="200">ファイル名</th>
+                <td>{{.File.Name}}</td>
+            </tr>
+            <tr>
+                <th>有効期限</th>
+                <td>{{.File.FormatDeadline}}</td>
+            </tr>
+            {{if ne .File.DownloadLimit 0}}
+                <tr>
+                    <th>残りダウンロード可能回数</th>
+                    <td>{{.File.RemainingDownloadableCount}}回</td>
+                </tr>
+            {{end}}
+        </table>
         {{if ne .File.EncryptedPassword ""}}
             <p>このファイルをダウンロードするためにはパスワードが必要です。</p>
             <div class="form-group">
