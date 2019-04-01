@@ -43,6 +43,7 @@
           <label for="message">フリーメッセージ</label>
           <textarea name="message" class="form-control"></textarea>
         </div>
+        <p style="font-size: 12px;">※ 設定したパスワードは送信されるメールに含まれません。</p>
       </div>
       <div class="mt20">
         <input type="submit" value="送信" class="btn btn-primary">
