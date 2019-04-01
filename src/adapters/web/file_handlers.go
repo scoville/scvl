@@ -142,7 +142,7 @@ func (web *Web) fileDownloadHandler(w http.ResponseWriter, r *http.Request) {
 	fileSize := len(string(data))
 
 	urlEncodedFileName := url.QueryEscape(fileName)
-	contentDisposition := fmt.Sprintf("attachment; filename=\"%s\" filename*=UTF-8''%s", fileName, urlEncodedFileName)
+	contentDisposition := fmt.Sprintf("attachment; filename=\"%s\"; filename*=UTF-8''%s", fileName, urlEncodedFileName)
 
 	w.Header().Set("Content-Type", mime)
 	w.Header().Set("Content-Disposition", contentDisposition)
