@@ -58,7 +58,7 @@
       <div class="panel-body">
         <p>ダウンロード用リンク:</p>
         <p>
-          <input id="shortenUrl" type="text" value="{{.Slug}}" readonly>
+          <input id="shortenUrlFile" class="copy-target" type="text" value="{{.Slug}}" readonly>
           <span class="copy">
             <i class="material-icons">content_copy</i>
             <span class="hint">コピーする</span>

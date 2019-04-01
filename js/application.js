@@ -2,8 +2,11 @@ $(function(){
     if($('#shortenUrl')[0]) {
         $('#shortenUrl').val(location.origin + "/" + $('#shortenUrl').val());
     }
+    if($('#shortenUrlFile')[0]) {
+        $('#shortenUrlFile').val(location.origin + "/files/" + $('#shortenUrl').val());
+    }
     $('.copy i').on('click', function(){
-        $('#shortenUrl').select();
+        $('.copy-target').select();
         document.execCommand("copy");
         $('.copy .hint').css('visibility', 'visible').text('コピー完了');
         setTimeout(function(){

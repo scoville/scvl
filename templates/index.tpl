@@ -63,7 +63,7 @@
       <div class="panel-body">
         <p>短縮結果:</p>
         <p>
-          <input id="shortenUrl" type="text" value="{{.Slug}}" readonly>
+          <input id="shortenUrl" class="copy-target" type="text" value="{{.Slug}}" readonly>
           <span class="copy">
             <i class="material-icons">content_copy</i>
             <span class="hint">コピーする</span>
