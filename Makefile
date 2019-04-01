@@ -7,13 +7,12 @@ ENV ?= development
 
 # Setup
 setup:
-	go get github.com/golang/lint/golint
 	go get golang.org/x/tools/cmd/goimports
 	go get github.com/Songmu/make2help/cmd/make2help
+	go get github.com/markbates/refresh
 
 run:
-	go build -o bin/scvl_dev
-	bin/scvl_dev
+	refresh run
 
 deploy:
 	GOOS=linux GOARCH=amd64 go build -ldflags "$(LDFLAGS)" -o bin/scvl

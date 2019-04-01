@@ -1,4 +1,4 @@
-package main
+package redis
 
 import "testing"
 
@@ -6,12 +6,12 @@ const testRedisDB = 999
 
 func TestRedis(t *testing.T) {
 	var err error
-	client, err = newRedisClient()
+	client, err := NewClient()
 	if err != nil {
 		t.Fatal("cannot connect to redis server")
 	}
 	defer client.Close()
-	client.setDatabase(testRedisDB)
+	client.SetDatabase(testRedisDB)
 
 	hash := "hogehoge"
 	expected := "https://en-courage.com"

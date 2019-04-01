@@ -1,13 +1,15 @@
-package main
+package redis
 
 import (
 	"fmt"
 
-	redis "github.com/garyburd/redigo/redis"
+	redigo "github.com/garyburd/redigo/redis"
+	"github.com/scoville/scvl/src/engine"
 )
 
-func newRedisClient() (r *redisClient, err error) {
-	c, err := redis.Dial("tcp", ":6379")
+// NewClient creates and returns redis client
+func NewClient() (r engine.RedisClient, err error) {
+	c, err := redigo.Dial("tcp", ":6379")
 	if err != nil {
 		return
 	}
@@ -16,7 +18,7 @@ func newRedisClient() (r *redisClient, err error) {
 }
 
 type redisClient struct {
-	c redis.Conn
+	c redigo.Conn
 }
 
 func (r *redisClient) SetURL(slug, url string) {
@@ -24,7 +26,7 @@ func (r *redisClient) SetURL(slug, url string) {
 }
 
 func (r *redisClient) GetURL(slug string) string {
-	url, err := redis.String(r.c.Do("GET", r.urlKey(slug)))
+	url, err := redigo.String(r.c.Do("GET", r.urlKey(slug)))
 	if err != nil {
 		return ""
 	}
@@ -40,7 +42,7 @@ func (r *redisClient) SetOGPID(slug string, id int) {
 }
 
 func (r *redisClient) GetOGPID(slug string) int {
-	ogpID, err := redis.Int(r.c.Do("GET", r.ogpIDKey(slug)))
+	ogpID, err := redigo.Int(r.c.Do("GET", r.ogpIDKey(slug)))
 	if err != nil {
 		return 0
 	}
@@ -55,7 +57,7 @@ func (r *redisClient) Close() (err error) {
 	return r.c.Close()
 }
 
-func (r *redisClient) setDatabase(db uint) {
+func (r *redisClient) SetDatabase(db uint) {
 	r.c.Send("SELECT", db)
 }
 

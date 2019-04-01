@@ -12,15 +12,17 @@ $(function(){
     });
 
     // UTM
-    var params = getParams($('#url').val());
-    if(params["utm_source"]) {
-        $('input[name="utm_source"]').val(params["utm_source"]);
-    }
-    if(params["utm_medium"]) {
-        $('select[name="utm_medium"]').val(params["utm_medium"]);
-    }
-    if(params["utm_campaign"]) {
-        $('input[name="utm_campaign"]').val(params["utm_campaign"]);
+    if($('#url')[0]) {
+        var params = getParams($('#url').val());
+        if(params["utm_source"]) {
+            $('input[name="utm_source"]').val(params["utm_source"]);
+        }
+        if(params["utm_medium"]) {
+            $('select[name="utm_medium"]').val(params["utm_medium"]);
+        }
+        if(params["utm_campaign"]) {
+            $('input[name="utm_campaign"]').val(params["utm_campaign"]);
+        }
     }
     if($('#utm')[0] && $('#utm')[0].checked) {
         $('.utm-information').show();
@@ -48,6 +50,18 @@ $(function(){
             }
         } else {
             $('.ogp-information').hide();
+        }
+    })
+
+    // Email
+    if($('#email')[0] && $('#email')[0].checked) {
+        $('.email-information').show();
+    }
+    $('#email').on('change', function() {
+        if(this.checked) {
+            $('.email-information').show();
+        } else {
+            $('.email-information').hide();
         }
     })
 
