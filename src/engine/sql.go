@@ -25,4 +25,6 @@ type SQLClient interface {
 	UpdateFile(*domain.File, *domain.File) error
 
 	CreateFileDownload(string, *domain.FileDownload) error
+
+	CreateEmail(email *domain.Email) error
 }

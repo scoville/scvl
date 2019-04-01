@@ -27,14 +27,19 @@ func (e *Engine) FindFile(slug string, userID int) (file *domain.File, err error
 
 // UploadFileRequest is the request struct for the UploadFile function
 type UploadFileRequest struct {
-	DownloadLimit int
-	Email         string
-	File          multipart.File
-	FileName      string
-	FileSize      int64
-	Password      string
-	UserID        int
-	ValidDays     int
+	DownloadLimit   int
+	File            multipart.File
+	FileName        string
+	FileSize        int64
+	Password        string
+	UserID          int
+	ValidDays       int
+	SendEmail       bool
+	ReceiverAddress string
+	ReceiverName    string
+	SenderName      string
+	BCCAddress      string
+	Message         string
 }
 
 // UploadFile uploads a file to S3
@@ -69,9 +74,23 @@ func (e *Engine) UploadFile(req UploadFileRequest) (file *domain.File, err error
 	if err != nil {
 		return
 	}
-	if req.Email != "" {
-		err = e.awsClient.SendMail(req.Email, "ファイルが共有されました", e.baseURL+"/files/"+file.Slug)
+	if !req.SendEmail {
+		return
 	}
+	file.Email = &domain.Email{
+		FileID:          int(file.ID),
+		SenderName:      req.SenderName,
+		ReceiverName:    req.ReceiverName,
+		ReceiverAddress: req.ReceiverAddress,
+		BCCAddress:      req.BCCAddress,
+		Message:         req.Message,
+	}
+	err = e.sqlClient.CreateEmail(file.Email)
+	if err != nil {
+		return
+	}
+
+	err = e.awsClient.SendMail(file)
 	return
 }
 
@@ -122,7 +141,7 @@ func (e *Engine) DownloadFile(req *DownloadFileRequest) (fileName string, data [
 
 // UpdateFileRequest is the request struct for UpdateFile function
 type UpdateFileRequest struct {
-	Slug string
+	Slug          string
 	DownloadLimit int
 	File          multipart.File
 	FileName      string

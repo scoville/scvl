@@ -2,6 +2,7 @@ package domain
 
 import (
 	"errors"
+	"path/filepath"
 	"time"
 )
 
@@ -20,6 +21,12 @@ type File struct {
 
 	Downloads     []FileDownload `json:"file_downloads"`
 	DownloadCount uint           `json:"download_count" gorm:"-"`
+	Email         *Email         `json:"email"`
+}
+
+// Name returns the name of the file
+func (f *File) Name() string {
+	return filepath.Base(f.Path)
 }
 
 // Downloadable returns error if it cannot be downloaded

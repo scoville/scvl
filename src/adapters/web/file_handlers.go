@@ -1,12 +1,14 @@
 package web
 
 import (
+	"bytes"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
+	"net/url"
 	"strconv"
 	"time"
-	"bytes"
 
 	"github.com/gorilla/context"
 	"github.com/gorilla/mux"
@@ -24,6 +26,8 @@ func (web *Web) filesHandler(w http.ResponseWriter, r *http.Request) {
 	user, ok := context.Get(r, "user").(*domain.User)
 	if ok {
 		resp["User"] = user
+		resp["SenderName"] = user.Name
+		resp["BCCAddress"] = user.Email
 	}
 	loginURL, ok := context.Get(r, "login_url").(string)
 	if ok {
@@ -56,7 +60,6 @@ func (web *Web) fileUploadHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	req.Email = r.FormValue("email")
 	req.Password = r.FormValue("password")
 
 	f, info, err := r.FormFile("file")
@@ -70,8 +73,16 @@ func (web *Web) fileUploadHandler(w http.ResponseWriter, r *http.Request) {
 	req.FileName = info.Filename
 	req.FileSize = info.Size
 
+	req.SendEmail = r.FormValue("email") == "on"
+	req.ReceiverAddress = r.FormValue("receiver_address")
+	req.ReceiverName = r.FormValue("receiver_name")
+	req.SenderName = r.FormValue("sender_name")
+	req.BCCAddress = r.FormValue("bcc_address")
+	req.Message = r.FormValue("message")
+
 	file, err := web.engine.UploadFile(req)
 	if err != nil {
+		log.Println("upload file failed: " + err.Error())
 		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
 		return
 	}
@@ -109,12 +120,11 @@ func (web *Web) fileShowHandler(w http.ResponseWriter, r *http.Request) {
 	renderTemplate(w, r, "/file.tpl", resp)
 }
 
-
 func (web *Web) fileDownloadHandler(w http.ResponseWriter, r *http.Request) {
 	slug := mux.Vars(r)["slug"]
 	fileName, data, err := web.engine.DownloadFile(&engine.DownloadFileRequest{
-		Slug: slug,
-		Password: r.FormValue("password"),
+		Slug:      slug,
+		Password:  r.FormValue("password"),
 		RealIP:    realip.RealIP(r),
 		Referer:   r.Referer(),
 		UserAgent: r.UserAgent(),
@@ -131,8 +141,11 @@ func (web *Web) fileDownloadHandler(w http.ResponseWriter, r *http.Request) {
 	mime := http.DetectContentType(data)
 	fileSize := len(string(data))
 
+	urlEncodedFileName := url.QueryEscape(fileName)
+	contentDisposition := fmt.Sprintf("attachment; filename=\"%s\" filename*=UTF-8''%s", fileName, urlEncodedFileName)
+
 	w.Header().Set("Content-Type", mime)
-	w.Header().Set("Content-Disposition", "attachment; filename="+fileName+"")
+	w.Header().Set("Content-Disposition", contentDisposition)
 	w.Header().Set("Expires", "0")
 	w.Header().Set("Content-Transfer-Encoding", "binary")
 	w.Header().Set("Content-Length", strconv.Itoa(fileSize))

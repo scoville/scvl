@@ -15,14 +15,35 @@
         <input type="number" name="valid_days" value="0" class="form-control" required />
       </div>
       <div class="form-group">
-        <label for="email">送信先メールアドレス（任意）</label>
-        <input type="email" name="email" value="" class="form-control" reuired />
-      </div>
-      <div class="form-group">
         <label for="password">パスワード（任意）</label>
         <input type="password" name="password" value="" class="form-control" />
       </div>
       <input type="file" name="file" required>
+      <label class="toggle-email mt20">
+        <input id="email" type="checkbox" name="email">メールを送信する
+      </label>
+      <div class="email-information">
+        <div class="form-group">
+          <label for="receiver_address">送信先メールアドレス</label>
+          <input type="email" name="receiver_address" value="" class="form-control" />
+        </div>
+        <div class="form-group">
+          <label for="receiver_name">宛名</label>
+          <input type="text" name="receiver_name" value="" class="form-control" placeholder="山田 太郎" />
+        </div>
+        <div class="form-group">
+          <label for="sender_name">送信者名</label>
+          <input type="text" name="sender_name" value="{{.SenderName}}" class="form-control" />
+        </div>
+        <div class="form-group">
+          <label for="bcc_address">BCCアドレス(任意)</label>
+          <input type="text" name="bcc_address" value="{{.BCCAddress}}" class="form-control" />
+        </div>
+        <div class="form-group">
+          <label for="message">フリーメッセージ</label>
+          <textarea name="message" class="form-control"></textarea>
+        </div>
+      </div>
       <div class="mt20">
         <input type="submit" value="送信" class="btn btn-primary">
       </div>

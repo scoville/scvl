@@ -7,13 +7,11 @@ type Engine struct {
 	awsClient     AWSClient
 	googleClient  GoogleClient
 	allowedDomain string
-	baseURL       string
 }
 
 // Options are meant to be passed to the New function
 type Options struct {
 	AllowedDomain string
-	BaseURL       string
 }
 
 // New creates the engine instance
@@ -24,6 +22,5 @@ func New(redisClient RedisClient, sqlClient SQLClient, awsClient AWSClient, goog
 		awsClient:     awsClient,
 		googleClient:  googleClient,
 		allowedDomain: options.AllowedDomain,
-		baseURL:       options.BaseURL,
 	}
 }

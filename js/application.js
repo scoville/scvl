@@ -53,6 +53,18 @@ $(function(){
         }
     })
 
+    // Email
+    if($('#email')[0] && $('#email')[0].checked) {
+        $('.email-information').show();
+    }
+    $('#email').on('change', function() {
+        if(this.checked) {
+            $('.email-information').show();
+        } else {
+            $('.email-information').hide();
+        }
+    })
+
     function getParams(url) {
         var params = {};
         if(url.split("?").length <= 1) {

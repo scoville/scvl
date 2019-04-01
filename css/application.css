@@ -68,15 +68,19 @@ input#shortenUrl {
   cursor: pointer;
 }
 
-.toggle-utm, .toggle-ogp {
+.toggle-utm, .toggle-ogp, .toggle-email {
   display: block;
   margin: 12px 0;
 }
 
-.toggle-utm input, .toggle-ogp input {
+.toggle-utm input, .toggle-ogp input, .toggle-email input {
   margin-right: 8px;
 }
 
-.utm-information, .ogp-information {
+.utm-information, .ogp-information, .email-information {
   display: none;
+}
+
+textarea {
+  min-height: 140px;
 }

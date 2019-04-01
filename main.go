@@ -9,9 +9,9 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/scoville/scvl/src/adapters/web"
 	"github.com/scoville/scvl/src/engine"
+	"github.com/scoville/scvl/src/providers/awsclient"
 	"github.com/scoville/scvl/src/providers/google"
 	"github.com/scoville/scvl/src/providers/redis"
-	"github.com/scoville/scvl/src/providers/awsclient"
 	"github.com/scoville/scvl/src/providers/sql"
 )
 
@@ -39,14 +39,15 @@ func main() {
 	}
 	defer redisClient.Close()
 
-	s3Client, err := awsclient.NewClient(awsclient.Config{
-		AccessKey: os.Getenv("AWS_ACCESS_KEY"),
-		AccessSecret: os.Getenv("AWS_SECRET_ACCESS_KEY"),
-		S3Bucket: os.Getenv("S3_BUCKET"),
-		S3Region: os.Getenv("S3_REGION"),
-		SESRegion: os.Getenv("SES_REGION"),
-		MailFrom: os.Getenv("MAIL_FROM"),
-		MailBccAdress: os.Getenv("MAIL_BCC_ADDRESS"),
+	awsClient, err := awsclient.NewClient(awsclient.Config{
+		AccessKey:      os.Getenv("AWS_ACCESS_KEY"),
+		AccessSecret:   os.Getenv("AWS_SECRET_ACCESS_KEY"),
+		S3Bucket:       os.Getenv("S3_BUCKET"),
+		S3Region:       os.Getenv("S3_REGION"),
+		SESRegion:      os.Getenv("SES_REGION"),
+		MailFrom:       os.Getenv("MAIL_FROM"),
+		MailBCCAddress: os.Getenv("MAIL_BCC_ADDRESS"),
+		BaseURL:        os.Getenv("BASE_URL"),
 	})
 	if err != nil {
 		log.Fatalf("Failed to create s3Client: %v", err)
@@ -61,11 +62,10 @@ func main() {
 	engine := engine.New(
 		redisClient,
 		sqlClient,
-		s3Client,
+		awsClient,
 		googleClient,
 		engine.Options{
 			AllowedDomain: os.Getenv("ALLOWED_DOMAIN"),
-			BaseURL: os.Getenv("BASE_URL"),
 		},
 	)
 
