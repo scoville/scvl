@@ -33,6 +33,7 @@ func (e *Email) FormatMessage() template.HTML {
 }
 
 var emailTemplate *template.Template
+var emailPasswordTemplate *template.Template
 
 // HTML returns email body in HTML
 func (e *Email) HTML(baseURL string, file *File) (string, error) {
@@ -44,6 +45,23 @@ func (e *Email) HTML(baseURL string, file *File) (string, error) {
 	err := emailTemplate.Execute(&buf, map[string]interface{}{
 		"BaseURL": baseURL,
 		"File":    file,
+	})
+	if err != nil {
+		return "", err
+	}
+	return buf.String(), nil
+}
+
+// PasswordHTML returns email body in HTML
+func (e *Email) PasswordHTML(file *File, password string) (string, error) {
+	if emailPasswordTemplate == nil {
+		emailPasswordTemplate = template.Must(template.ParseFiles("templates/email_password.tpl"))
+	}
+
+	var buf bytes.Buffer
+	err := emailPasswordTemplate.Execute(&buf, map[string]interface{}{
+		"File":     file,
+		"Password": password,
 	})
 	if err != nil {
 		return "", err

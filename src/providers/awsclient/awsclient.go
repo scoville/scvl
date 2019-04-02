@@ -5,6 +5,7 @@ import (
 	"errors"
 	"io"
 	"net/mail"
+	"strings"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
@@ -89,22 +90,31 @@ func (c *awsClient) DownloadFromS3(path string) (data []byte, err error) {
 	return
 }
 
-func (c *awsClient) SendMail(file *domain.File) error {
+func (c *awsClient) SendMail(file *domain.File, password string) error {
 	if file.Email == nil {
 		return errors.New("Email is empty")
 	}
+	toAddresses := []*string{}
+	for _, email := range strings.Split(file.Email.ReceiverAddress, ",") {
+		if email != "" {
+			toAddresses = append(toAddresses, aws.String(strings.TrimSpace(email)))
+		}
+	}
 	bccAddresses := c.mailBccAddresses
-	if file.Email.BCCAddress != "" {
-		bccAddresses = append(c.mailBccAddresses, aws.String(file.Email.BCCAddress))
+	for _, email := range strings.Split(file.Email.BCCAddress, ",") {
+		if email != "" {
+			bccAddresses = append(bccAddresses, aws.String(strings.TrimSpace(email)))
+		}
 	}
 	body, err := file.Email.HTML(c.baseURL, file)
 	if err != nil {
 		return err
 	}
+
 	svc := ses.New(c.svc, aws.NewConfig().WithRegion(c.sesRegion))
-	input := &ses.SendEmailInput{
+	_, err = svc.SendEmail(&ses.SendEmailInput{
 		Destination: &ses.Destination{
-			ToAddresses:  []*string{aws.String(file.Email.ReceiverAddress)},
+			ToAddresses:  toAddresses,
 			BccAddresses: bccAddresses,
 		},
 		Message: &ses.Message{
@@ -120,8 +130,35 @@ func (c *awsClient) SendMail(file *domain.File) error {
 			},
 		},
 		Source: aws.String(c.mailFrom.String()),
+	})
+	if err != nil {
+		return err
 	}
-
-	_, err = svc.SendEmail(input)
+	if password == "" {
+		return nil
+	}
+	passBody, err := file.Email.PasswordHTML(file, password)
+	if err != nil {
+		return err
+	}
+	_, err = svc.SendEmail(&ses.SendEmailInput{
+		Destination: &ses.Destination{
+			ToAddresses:  toAddresses,
+			BccAddresses: bccAddresses,
+		},
+		Message: &ses.Message{
+			Body: &ses.Body{
+				Html: &ses.Content{
+					Charset: aws.String("UTF-8"),
+					Data:    aws.String(passBody),
+				},
+			},
+			Subject: &ses.Content{
+				Charset: aws.String("UTF-8"),
+				Data:    aws.String("パスワードをお知らせします"),
+			},
+		},
+		Source: aws.String(c.mailFrom.String()),
+	})
 	return err
 }

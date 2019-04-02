@@ -19,13 +19,14 @@
         <input type="password" name="password" value="" class="form-control" />
       </div>
       <input type="file" name="file" required>
+      <p style="font-size: 12px;">※ ファイルサイズの上限は20MBです。</p>
       <label class="toggle-email mt20">
         <input id="email" type="checkbox" name="email">メールを送信する
       </label>
       <div class="email-information">
         <div class="form-group">
           <label for="receiver_address">送信先メールアドレス</label>
-          <input type="email" name="receiver_address" value="" class="form-control" />
+          <input type="email" name="receiver_address" value="" class="form-control" placeholder=",で区切って複数メールアドレスを入力可能" multiple/>
         </div>
         <div class="form-group">
           <label for="receiver_name">宛名</label>
@@ -37,13 +38,15 @@
         </div>
         <div class="form-group">
           <label for="bcc_address">BCCアドレス(任意)</label>
-          <input type="text" name="bcc_address" value="{{.BCCAddress}}" class="form-control" />
+          <input type="email" name="bcc_address" value="{{.BCCAddress}}" class="form-control" multiple/>
         </div>
         <div class="form-group">
           <label for="message">フリーメッセージ</label>
           <textarea name="message" class="form-control"></textarea>
         </div>
-        <p style="font-size: 12px;">※ 設定したパスワードは送信されるメールに含まれません。</p>
+        <label>
+          <input type="checkbox" name="send_password">パスワードを別のメールで自動送信する
+        </label>
       </div>
       <div class="mt20">
         <input type="submit" value="送信" class="btn btn-primary">

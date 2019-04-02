@@ -40,6 +40,7 @@ type UploadFileRequest struct {
 	SenderName      string
 	BCCAddress      string
 	Message         string
+	SendPassword    bool
 }
 
 // UploadFile uploads a file to S3
@@ -90,7 +91,11 @@ func (e *Engine) UploadFile(req UploadFileRequest) (file *domain.File, err error
 		return
 	}
 
-	err = e.awsClient.SendMail(file)
+	password := ""
+	if req.SendPassword {
+		password = req.Password
+	}
+	err = e.awsClient.SendMail(file, password)
 	return
 }
 

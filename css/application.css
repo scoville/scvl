@@ -73,7 +73,7 @@ input#shortenUrl {
   margin: 12px 0;
 }
 
-.toggle-utm input, .toggle-ogp input, .toggle-email input {
+input[type="checkbox"] {
   margin-right: 8px;
 }
 

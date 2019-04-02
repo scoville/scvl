@@ -79,6 +79,7 @@ func (web *Web) fileUploadHandler(w http.ResponseWriter, r *http.Request) {
 	req.SenderName = r.FormValue("sender_name")
 	req.BCCAddress = r.FormValue("bcc_address")
 	req.Message = r.FormValue("message")
+	req.SendPassword = r.FormValue("send_password") == "on"
 
 	file, err := web.engine.UploadFile(req)
 	if err != nil {
