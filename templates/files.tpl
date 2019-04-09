@@ -19,7 +19,7 @@
         <input type="password" name="password" value="" class="form-control" />
       </div>
       <input type="file" name="file" required>
-      <p style="font-size: 12px;">※ ファイルサイズの上限は20MBです。</p>
+      <p style="font-size: 12px;">※ ファイルサイズの上限は50MBです。</p>
       <label class="toggle-email mt20">
         <input id="email" type="checkbox" name="email">メールを送信する
       </label>
