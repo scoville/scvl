@@ -27,4 +27,6 @@ type SQLClient interface {
 	CreateFileDownload(string, *domain.FileDownload) error
 
 	CreateEmail(email *domain.Email) error
+
+	CreateImage(image *domain.Image) error
 }

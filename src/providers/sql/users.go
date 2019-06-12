@@ -18,6 +18,9 @@ func (c *client) FindUser(id uint) (user *domain.User, err error) {
 		Preload("Files", func(db *gorm.DB) *gorm.DB {
 			return db.Order("files.created_at DESC")
 		}).
+		Preload("Images", func(db *gorm.DB) *gorm.DB {
+			return db.Order("images.created_at DESC")
+		}).
 		First(user, id).Error
 	if err != nil {
 		return

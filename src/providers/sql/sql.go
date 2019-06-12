@@ -23,6 +23,7 @@ func NewClient(dbURL string) (engine.SQLClient, error) {
 		&domain.Email{},
 		&domain.FileDownload{},
 		&domain.File{},
+		&domain.Image{},
 		&domain.OGP{},
 		&domain.PageView{},
 		&domain.Page{},

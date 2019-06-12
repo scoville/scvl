@@ -37,6 +37,8 @@ func (web *Web) Start(port string) error {
 	r.Handle("/files/{slug}/download", web.authenticate(web.fileDownloadHandler)).Methods(http.MethodPost)
 	r.Handle("/files/{slug}/edit", web.authenticate(web.editFileHandler)).Methods(http.MethodGet)
 	r.HandleFunc("/files/{slug}", web.authenticate(web.updateFileHandler)).Methods(http.MethodPost, http.MethodPut, http.MethodPatch)
+	r.Handle("/images", web.authenticate(web.imagesHandler)).Methods(http.MethodGet)
+	r.Handle("/images", web.authenticate(web.imageUploadHandler)).Methods(http.MethodPost)
 
 	r.HandleFunc("/{slug}/qr.png", web.qrHandler).Methods(http.MethodGet)
 	r.Handle("/{slug}/edit", web.authenticate(web.editHandler)).Methods(http.MethodGet)

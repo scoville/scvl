@@ -12,4 +12,5 @@ type User struct {
 	Email     string     `json:"email" gorm:"type:varchar(100);unique_index"`
 	Pages     []*Page    `json:"pages"`
 	Files     []*File    `json:"files"`
+	Images    []*Image   `json:"images"`
 }

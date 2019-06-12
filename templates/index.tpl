@@ -74,7 +74,10 @@
   {{end}}
 </div>
 
-<a href="/files">ファイルアップロードはこちら</a>
+<ul class="menu">
+  <li><a href="/files">ファイルアップロードはこちら</a></li>
+  <li><a href="/images">画像アップロードはこちら</a></li>
+</ul>
 
 {{if .User}}
   <h2>{{.User.Name}}の短縮したURL一覧</h2>
