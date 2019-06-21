@@ -76,6 +76,7 @@
   <h2>{{.User.Name}}のアップロードしたファイル一覧</h2>
   <table class="table files">
     <tr>
+      <th width="80">ファイル名</th>
       <th width="80">ダウンロード用リンク</th>
       <th width="140">ダウンロード回数 / 制限回数</th>
       <th width="100">ダウンロード期限</th>
@@ -83,6 +84,7 @@
     </tr>
     {{range .User.Files}}
       <tr>
+        <td class="truncate">{{.Name}}</td>
         <td class="truncate"><a href="/files/{{.Slug}}" target="_blank">/files/{{.Slug}}</a></td>
         <td>{{.DownloadCount}}{{if ne .DownloadLimit 0}} / {{.DownloadLimit}}{{end}}</td>
         <td>{{.FormatDeadline}}</td>
