@@ -39,32 +39,9 @@ func (e *Engine) Shorten(req *ShortenRequest) (page *domain.Page, err error) {
 		err = errors.New("url cannot be empty")
 		return
 	}
-	user, err := e.sqlClient.FindUser(uint(req.UserID))
+	title, err := e.fetchTitle(req.UserID, req.URL)
 	if err != nil {
 		return
-	}
-	var title string
-	if strings.HasPrefix(req.URL, "https://docs.google.com/") {
-		paths := strings.Split(req.URL, "/")
-		if len(paths) > 5 {
-			title, err = e.googleClient.GetDriveFileTitle(user, paths[5])
-			if err != nil {
-				return
-			}
-		}
-	} else {
-		var resp *http.Response
-		resp, err = http.Get("https://ogp.en-courage.com?url=" + req.URL)
-		if err != nil {
-			return
-		}
-		defer resp.Body.Close()
-		var ogp domain.OGP
-		err = json.NewDecoder(resp.Body).Decode(&ogp)
-		if err != nil {
-			return
-		}
-		title = ogp.Title
 	}
 
 	page = &domain.Page{
@@ -173,7 +150,12 @@ func (e *Engine) UpdatePage(req *UpdatePageRequest) (page *domain.Page, err erro
 		return
 	}
 
-	err = e.sqlClient.UpdatePage(page, &domain.Page{URL: req.URL})
+	title, err := e.fetchTitle(req.UserID, req.URL)
+	if err != nil {
+		return
+	}
+
+	err = e.sqlClient.UpdatePage(page, &domain.Page{URL: req.URL, Title: title})
 	if err != nil {
 		return
 	}
@@ -210,5 +192,32 @@ func (e *Engine) UpdatePage(req *UpdatePageRequest) (page *domain.Page, err erro
 			return
 		}
 	}
+	return
+}
+
+func (e *Engine) fetchTitle(userID int, url string) (title string, err error) {
+	user, err := e.sqlClient.FindUser(uint(userID))
+	if err != nil {
+		return
+	}
+	if strings.HasPrefix(url, "https://docs.google.com/") {
+		paths := strings.Split(url, "/")
+		if len(paths) > 5 {
+			title, err = e.googleClient.GetDriveFileTitle(user, paths[5])
+		}
+		return
+	}
+	var resp *http.Response
+	resp, err = http.Get("https://ogp.en-courage.com?url=" + url)
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+	var ogp domain.OGP
+	err = json.NewDecoder(resp.Body).Decode(&ogp)
+	if err != nil {
+		return
+	}
+	title = ogp.Title
 	return
 }
