@@ -3,6 +3,7 @@ package domain
 import (
 	"bytes"
 	"html/template"
+	"os"
 	"strings"
 	"time"
 )
@@ -40,9 +41,14 @@ func (e *Email) HTML(fileDomain string, file *File) (string, error) {
 	if emailTemplate == nil {
 		emailTemplate = template.Must(template.ParseFiles("templates/email.tpl"))
 	}
+	scheme := "https://"
+	if strings.Contains(os.Getenv("MAIN_DOMAIN"), "localhost") {
+		scheme = "http://"
+	}
 
 	var buf bytes.Buffer
 	err := emailTemplate.Execute(&buf, map[string]interface{}{
+		"Scheme":     scheme,
 		"FileDomain": fileDomain,
 		"File":       file,
 	})

@@ -15,11 +15,16 @@ run:
 	refresh run
 
 deploy:
+	rm -f bin/*
 	GOOS=linux GOARCH=amd64 go build -ldflags "$(LDFLAGS)" -o bin/scvl
 
 	ssh scvl0001w "supervisorctl stop scvl"
 	scp -r bin css js templates scvl0001w:/home/ec2-user/scvl/
 	ssh scvl0001w "supervisorctl start scvl"
+
+	ssh scvl0002w "supervisorctl stop scvl"
+	scp -r bin css js templates scvl0002w:/home/ec2-user/scvl/
+	ssh scvl0002w "supervisorctl start scvl"
 
 # Show help
 help:
