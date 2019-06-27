@@ -2,9 +2,6 @@ $(function(){
     if($('#shortenUrl')[0]) {
         $('#shortenUrl').val(location.origin + "/" + $('#shortenUrl').val());
     }
-    if($('#shortenUrlFile')[0]) {
-        $('#shortenUrlFile').val(location.origin + "/files/" + $('#shortenUrlFile').val());
-    }
     $('.copy i').on('click', function(){
         $('.copy-target').select();
         document.execCommand("copy");

@@ -5,7 +5,7 @@
     <a href="{{.LoginURL}}" class="login btn btn-primary btn-lg">ログイン</a>
   {{else}}
     <p>ファイルのアップロードができます。</p>
-    <form action="/files" method="post" enctype="multipart/form-data">
+    <form action="/" method="post" enctype="multipart/form-data">
       <div class="form-group">
         <label for="download_limit">ダウンロード制限回数（無制限の場合は0を指定）</label>
         <input type="number" name="download_limit" value="1" class="form-control" required />
@@ -61,7 +61,7 @@
       <div class="panel-body">
         <p>ダウンロード用リンク:</p>
         <p>
-          <input id="shortenUrlFile" class="copy-target" type="text" value="{{.Slug}}" readonly>
+          <input id="shortenUrl" class="copy-target" type="text" value="{{.Slug}}" readonly>
           <span class="copy">
             <i class="material-icons">content_copy</i>
             <span class="hint">コピーする</span>
@@ -85,11 +85,11 @@
     {{range .User.Files}}
       <tr>
         <td class="truncate">{{.Name}}</td>
-        <td class="truncate"><a href="/files/{{.Slug}}" target="_blank">/files/{{.Slug}}</a></td>
+        <td class="truncate"><a href="/{{.Slug}}" target="_blank">/{{.Slug}}</a></td>
         <td>{{.DownloadCount}}{{if ne .DownloadLimit 0}} / {{.DownloadLimit}}{{end}}</td>
         <td>{{.FormatDeadline}}</td>
         <td>
-          <a href="/files/{{.Slug}}/edit" class="btn btn-default">編集</a>
+          <a href="/{{.Slug}}/edit" class="btn btn-default">編集</a>
         </td>
       </tr>
     {{end}}

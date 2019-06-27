@@ -7,7 +7,7 @@
 {{end}}
 
 <h1>ファイルの編集</h1>
-<form action="/files/{{.File.Slug}}" method="post" enctype="multipart/form-data">
+<form action="/{{.File.Slug}}" method="post" enctype="multipart/form-data">
     <div class="form-group">
         <label for="download_limit">ダウンロード制限回数（無制限の場合は0を指定）</label>
         <input type="number" name="download_limit" value="{{.File.DownloadLimit}}" class="form-control" required />
@@ -22,6 +22,6 @@
     </div>
 </form>
 
-<a class="btn btn-default mt20" href="/files">ファイル一覧に戻る</a>
+<a class="btn btn-default mt20" href="/">ファイル一覧に戻る</a>
 
 {{end}}

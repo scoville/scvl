@@ -75,7 +75,7 @@
 </div>
 
 <ul class="menu">
-  <li><a href="/files">ファイルアップロードはこちら</a></li>
+  <li><a href="https://file.scvl.site">ファイルアップロードはこちら</a></li>
   <li><a href="/images">画像アップロードはこちら</a></li>
 </ul>
 

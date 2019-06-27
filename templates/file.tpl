@@ -8,7 +8,7 @@
 
 {{if .Downloadable}}
     <h1>ファイルのダウンロード</h1>
-    <form action="/files/{{.File.Slug}}/download" method="post">
+    <form action="/{{.File.Slug}}/download" method="post">
         <p class="mt20">以下のファイルをダウンロードします。</p>
         <table class="table mt20">
             <tr>
