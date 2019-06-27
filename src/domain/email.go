@@ -36,15 +36,15 @@ var emailTemplate *template.Template
 var emailPasswordTemplate *template.Template
 
 // HTML returns email body in HTML
-func (e *Email) HTML(baseURL string, file *File) (string, error) {
+func (e *Email) HTML(fileDomain string, file *File) (string, error) {
 	if emailTemplate == nil {
 		emailTemplate = template.Must(template.ParseFiles("templates/email.tpl"))
 	}
 
 	var buf bytes.Buffer
 	err := emailTemplate.Execute(&buf, map[string]interface{}{
-		"BaseURL": baseURL,
-		"File":    file,
+		"FileDomain": fileDomain,
+		"File":       file,
 	})
 	if err != nil {
 		return "", err

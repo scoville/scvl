@@ -23,7 +23,8 @@ type awsClient struct {
 	sesRegion        string
 	mailBccAddresses []*string
 	mailFrom         mail.Address
-	baseURL          string
+	mainDomain       string
+	fileDomain       string
 }
 
 // Config is params for NewClient
@@ -35,7 +36,8 @@ type Config struct {
 	SESRegion      string
 	MailFrom       string
 	MailBCCAddress string
-	BaseURL        string
+	MainDomain     string
+	FileDomain     string
 }
 
 // NewClient creates and returns awsClient
@@ -61,7 +63,8 @@ func NewClient(config Config) (engine.AWSClient, error) {
 			Address: config.MailFrom,
 		},
 		mailBccAddresses: []*string{aws.String(config.MailBCCAddress)},
-		baseURL:          config.BaseURL,
+		mainDomain:       config.MainDomain,
+		fileDomain:       config.FileDomain,
 	}, nil
 }
 
@@ -120,7 +123,7 @@ func (c *awsClient) SendMail(file *domain.File, password string) error {
 			bccAddresses = append(bccAddresses, aws.String(strings.TrimSpace(email)))
 		}
 	}
-	body, err := file.Email.HTML(c.baseURL, file)
+	body, err := file.Email.HTML(c.fileDomain, file)
 	if err != nil {
 		return err
 	}

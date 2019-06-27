@@ -47,7 +47,8 @@ func main() {
 		SESRegion:      os.Getenv("SES_REGION"),
 		MailFrom:       os.Getenv("MAIL_FROM"),
 		MailBCCAddress: os.Getenv("MAIL_BCC_ADDRESS"),
-		BaseURL:        os.Getenv("BASE_URL"),
+		MainDomain:     os.Getenv("MAIN_DOMAIN"),
+		FileDomain:     os.Getenv("FILE_DOMAIN"),
 	})
 	if err != nil {
 		log.Fatalf("Failed to create s3Client: %v", err)
