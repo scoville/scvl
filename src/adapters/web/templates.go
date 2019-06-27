@@ -4,6 +4,7 @@ import (
 	"html/template"
 	"net/http"
 	"os"
+	"strings"
 )
 
 var templates = map[string]*template.Template{}
@@ -12,7 +13,7 @@ var baseTplPath = "templates"
 func renderTemplate(w http.ResponseWriter, r *http.Request, path string, data map[string]interface{}) {
 	data["Digest"] = Digest
 	scheme := "https://"
-	if r.TLS == nil {
+	if strings.Contains(os.Getenv("MAIN_DOMAIN"), "localhost") {
 		scheme = "http://"
 	}
 	data["MainHost"] = scheme + os.Getenv("MAIN_DOMAIN")
