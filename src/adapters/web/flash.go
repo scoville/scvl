@@ -3,11 +3,13 @@ package web
 import (
 	"encoding/base64"
 	"net/http"
+	"os"
 	"time"
 )
 
 func setFlash(w http.ResponseWriter, name string, value []byte) {
 	c := &http.Cookie{Path: "/", Name: name, Value: base64.URLEncoding.EncodeToString(value)}
+	c.Domain = os.Getenv("MAIN_DOMAIN")
 	http.SetCookie(w, c)
 }
 

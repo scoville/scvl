@@ -18,11 +18,13 @@ type Web struct {
 }
 
 // New returns the Web instance
-func New(e *engine.Engine, sessionSecret string) *Web {
-	return &Web{
+func New(e *engine.Engine, sessionSecret, mainDomain string) *Web {
+	w := &Web{
 		engine: e,
 		store:  sessions.NewCookieStore([]byte(sessionSecret)),
 	}
+	w.store.Options.Domain = mainDomain
+	return w
 }
 
 // Start starts listen and serve

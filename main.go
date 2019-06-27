@@ -70,6 +70,6 @@ func main() {
 	)
 
 	web.Digest = revision
-	w := web.New(engine, os.Getenv("SESSION_SECRET"))
+	w := web.New(engine, os.Getenv("SESSION_SECRET"), os.Getenv("MAIN_DOMAIN"))
 	log.Fatal(w.Start(":8080"))
 }
