@@ -3,6 +3,7 @@ package web
 import (
 	"html/template"
 	"net/http"
+	"os"
 )
 
 var templates = map[string]*template.Template{}
@@ -10,6 +11,13 @@ var baseTplPath = "templates"
 
 func renderTemplate(w http.ResponseWriter, r *http.Request, path string, data map[string]interface{}) {
 	data["Digest"] = Digest
+	scheme := "https://"
+	if r.TLS == nil {
+		scheme = "http://"
+	}
+	data["MainHost"] = scheme + os.Getenv("MAIN_DOMAIN")
+	data["FileHost"] = scheme + os.Getenv("FILE_DOMAIN")
+	data["ImageHost"] = scheme + os.Getenv("IMAGE_DOMAIN")
 	tpl := findTemplate("/layouts.tpl", path)
 	tpl.ExecuteTemplate(w, "base", data)
 }

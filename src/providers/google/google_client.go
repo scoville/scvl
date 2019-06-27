@@ -23,6 +23,7 @@ func NewClient(clientID, clientSecret, redirectURL string) engine.GoogleClient {
 			Scopes: []string{
 				"https://www.googleapis.com/auth/userinfo.profile",
 				"https://www.googleapis.com/auth/userinfo.email",
+				"https://www.googleapis.com/auth/drive.metadata.readonly",
 			},
 			Endpoint: google.Endpoint,
 		},
@@ -41,6 +42,32 @@ func (c *googleClient) FetchUserInfo(code string) (user domain.User, err error) 
 	}
 	defer resp.Body.Close()
 	err = json.NewDecoder(resp.Body).Decode(&user)
+	if err != nil {
+		return
+	}
+	token, err := json.Marshal(tok)
+	if err != nil {
+		return
+	}
+	user.GoogleToken = string(token)
+	return
+}
+
+func (c *googleClient) GetDriveFileTitle(user *domain.User, id string) (title string, err error) {
+	tok := &oauth2.Token{}
+	err = json.Unmarshal([]byte(user.GoogleToken), tok)
+	if err != nil {
+		return
+	}
+	client := c.config.Client(oauth2.NoContext, tok)
+	resp, err := client.Get("https://www.googleapis.com/drive/v3/files/" + id)
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+	var m map[string]string
+	err = json.NewDecoder(resp.Body).Decode(&m)
+	title = m["name"]
 	return
 }
 

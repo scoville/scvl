@@ -39,7 +39,7 @@ func (c *client) FindOrCreateUser(params domain.User) (user *domain.User, err er
 	user = &domain.User{}
 	err = c.db.
 		Where(domain.User{Email: params.Email}).
-		Assign(domain.User{Name: params.Name}).
+		Assign(domain.User{Name: params.Name, GoogleToken: params.GoogleToken}).
 		FirstOrCreate(user).Error
 	return
 }

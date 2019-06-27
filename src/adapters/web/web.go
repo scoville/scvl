@@ -3,8 +3,10 @@ package web
 import (
 	"net/http"
 
+	"github.com/gorilla/context"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
+	"github.com/scoville/scvl/src/domain"
 	"github.com/scoville/scvl/src/engine"
 )
 
@@ -31,8 +33,9 @@ func New(e *engine.Engine, sessionSecret, mainDomain string) *Web {
 func (web *Web) Start(port string) error {
 	r := mux.NewRouter()
 
-	r.Handle("/shorten", web.authenticate(web.shortenHandler)).Methods(http.MethodPost)
 	r.Handle("/", web.authenticate(web.rootHandler)).Methods(http.MethodGet)
+	r.Handle("/shorten", web.authenticate(web.shortenHandler)).Methods(http.MethodPost)
+	r.Handle("/pages", web.authenticate(web.pagesHandler)).Methods(http.MethodGet)
 	r.Handle("/files", web.authenticate(web.filesHandler)).Methods(http.MethodGet)
 	r.Handle("/files", web.authenticate(web.fileUploadHandler)).Methods(http.MethodPost)
 	r.HandleFunc("/files/{slug}", web.fileShowHandler).Methods(http.MethodGet)
@@ -51,4 +54,17 @@ func (web *Web) Start(port string) error {
 	http.Handle("/js/", http.StripPrefix("/js/", http.FileServer(http.Dir("js/"))))
 	http.Handle("/", r)
 	return http.ListenAndServe(port, nil)
+}
+
+func (web *Web) rootHandler(w http.ResponseWriter, r *http.Request) {
+	resp := map[string]interface{}{}
+	user, ok := context.Get(r, "user").(*domain.User)
+	if ok {
+		resp["User"] = user
+	}
+	loginURL, ok := context.Get(r, "login_url").(string)
+	if ok {
+		resp["LoginURL"] = loginURL
+	}
+	renderTemplate(w, r, "/index.tpl", resp)
 }

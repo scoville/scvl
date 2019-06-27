@@ -22,6 +22,6 @@
     </div>
 </form>
 
-<a class="btn btn-default mt20" href="/">ファイル一覧に戻る</a>
+<a class="btn btn-default mt20" href="{{.FileHost}}">ファイル一覧に戻る</a>
 
 {{end}}

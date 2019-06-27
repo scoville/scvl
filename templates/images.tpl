@@ -5,7 +5,7 @@
     <a href="{{.LoginURL}}" class="login btn btn-primary btn-lg">ログイン</a>
   {{else}}
     <p>画像のアップロードができます。</p>
-    <form action="/images" method="post" enctype="multipart/form-data">
+    <form action="/" method="post" enctype="multipart/form-data">
       <input type="file" name="file" required>
       <p style="font-size: 12px;">※ ファイルサイズの上限は50MBです。</p>
       <div class="mt20">

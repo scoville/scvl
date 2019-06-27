@@ -15,7 +15,7 @@ import (
 	"github.com/tomasen/realip"
 )
 
-func (web *Web) rootHandler(w http.ResponseWriter, r *http.Request) {
+func (web *Web) pagesHandler(w http.ResponseWriter, r *http.Request) {
 	bytes, _ := getFlash(w, r, "url_slug")
 	resp := map[string]interface{}{}
 	if bytes != nil {
@@ -29,7 +29,7 @@ func (web *Web) rootHandler(w http.ResponseWriter, r *http.Request) {
 	if ok {
 		resp["LoginURL"] = loginURL
 	}
-	renderTemplate(w, r, "/index.tpl", resp)
+	renderTemplate(w, r, "/pages.tpl", resp)
 }
 
 func (web *Web) shortenHandler(w http.ResponseWriter, r *http.Request) {
@@ -57,7 +57,7 @@ func (web *Web) shortenHandler(w http.ResponseWriter, r *http.Request) {
 		"Slug": page.Slug,
 	})
 	setFlash(w, "url_slug", bytes)
-	http.Redirect(w, r, "/", http.StatusSeeOther)
+	http.Redirect(w, r, "/pages", http.StatusSeeOther)
 }
 
 func (web *Web) redirectHandler(w http.ResponseWriter, r *http.Request) {

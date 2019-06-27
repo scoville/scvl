@@ -82,6 +82,7 @@
       <th width="100">ダウンロード期限</th>
       <th width="100">編集</th>
     </tr>
+    {{$fileHost := .FileHost}}
     {{range .User.Files}}
       <tr>
         <td class="truncate">{{.Name}}</td>
@@ -89,7 +90,7 @@
         <td>{{.DownloadCount}}{{if ne .DownloadLimit 0}} / {{.DownloadLimit}}{{end}}</td>
         <td>{{.FormatDeadline}}</td>
         <td>
-          <a href="/{{.Slug}}/edit" class="btn btn-default">編集</a>
+          <a href="{{$fileHost}}/{{.Slug}}/edit" class="btn btn-default">編集</a>
         </td>
       </tr>
     {{end}}

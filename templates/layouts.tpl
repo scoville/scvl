@@ -2,7 +2,7 @@
 <!doctype html>
 <html>
 <head>
-  <title>SCVL URL Shortener</title>
+  <title>SCVL Toolbox</title>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
@@ -22,7 +22,7 @@
   <nav class="navbar navbar-inverse navbar-fixed-top">
     <div class="container">
       <div class="navbar-header">
-        <a class="navbar-brand" href="/">SCVL URL Shortener</a>
+        <a class="navbar-brand" href="{{.MainHost}}">SCVL Toolbox</a>
       </div>
     </div>
   </nav>

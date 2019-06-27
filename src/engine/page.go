@@ -1,7 +1,10 @@
 package engine
 
 import (
+	"encoding/json"
 	"errors"
+	"net/http"
+	"strings"
 
 	"github.com/mssola/user_agent"
 	"github.com/scoville/scvl/src/domain"
@@ -36,9 +39,38 @@ func (e *Engine) Shorten(req *ShortenRequest) (page *domain.Page, err error) {
 		err = errors.New("url cannot be empty")
 		return
 	}
+	user, err := e.sqlClient.FindUser(uint(req.UserID))
+	if err != nil {
+		return
+	}
+	var title string
+	if strings.HasPrefix(req.URL, "https://docs.google.com/") {
+		paths := strings.Split(req.URL, "/")
+		if len(paths) > 5 {
+			title, err = e.googleClient.GetDriveFileTitle(user, paths[5])
+			if err != nil {
+				return
+			}
+		}
+	} else {
+		var resp *http.Response
+		resp, err = http.Get("https://ogp.en-courage.com?url=" + req.URL)
+		if err != nil {
+			return
+		}
+		defer resp.Body.Close()
+		var ogp domain.OGP
+		err = json.NewDecoder(resp.Body).Decode(&ogp)
+		if err != nil {
+			return
+		}
+		title = ogp.Title
+	}
+
 	page = &domain.Page{
 		UserID: req.UserID,
 		Slug:   domain.GenerateSlug(5),
+		Title:  title,
 		URL:    req.URL,
 	}
 	err = e.sqlClient.CreatePage(page)

@@ -72,5 +72,6 @@ func main() {
 
 	web.Digest = revision
 	w := web.New(engine, os.Getenv("SESSION_SECRET"), os.Getenv("MAIN_DOMAIN"))
+	log.Println("running http server on :8080")
 	log.Fatal(w.Start(":8080"))
 }

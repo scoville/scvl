@@ -127,7 +127,7 @@ a[x-apple-data-detectors] {
   {{end}}
   <br>
   以下のURLからファイルにアクセスできます:<br>
-  <a href="https://{{.FileDomain}}/{{.File.Slug}}">https://{{.FileDomain}}/{{.File.Slug}}</a>
+  <a href="{{.Scheme}}{{.FileDomain}}/{{.File.Slug}}">{{.Scheme}}{{.FileDomain}}/{{.File.Slug}}</a>
   <br><br>
   {{if ne .File.Email.Message ""}}
     メッセージ<br>
