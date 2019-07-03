@@ -34,6 +34,7 @@ func (web *Web) Start(port string) error {
 	r := mux.NewRouter()
 
 	r.Handle("/", web.authenticate(web.rootHandler)).Methods(http.MethodGet)
+	r.Handle("/logout", web.authenticate(web.logoutHandler)).Methods(http.MethodPost)
 	r.Handle("/shorten", web.authenticate(web.shortenHandler)).Methods(http.MethodPost)
 	r.Handle("/pages", web.authenticate(web.pagesHandler)).Methods(http.MethodGet)
 	r.Handle("/files", web.authenticate(web.filesHandler)).Methods(http.MethodGet)
@@ -67,4 +68,11 @@ func (web *Web) rootHandler(w http.ResponseWriter, r *http.Request) {
 		resp["LoginURL"] = loginURL
 	}
 	renderTemplate(w, r, "/index.tpl", resp)
+}
+
+func (web *Web) logoutHandler(w http.ResponseWriter, r *http.Request) {
+	session, _ := web.store.Get(r, "scvl")
+	delete(session.Values, "user_id")
+	web.store.Save(r, w, session)
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }

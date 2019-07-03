@@ -72,5 +72,5 @@ func (c *googleClient) GetDriveFileTitle(user *domain.User, id string) (title st
 }
 
 func (c *googleClient) AuthCodeURL(state string) string {
-	return c.config.AuthCodeURL(state)
+	return c.config.AuthCodeURL(state, oauth2.AccessTypeOffline, oauth2.ApprovalForce)
 }
