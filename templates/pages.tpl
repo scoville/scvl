@@ -76,6 +76,7 @@
 
 {{if .User}}
   <h2>{{.User.Name}}の短縮したURL一覧</h2>
+  <p>全{{.Count}}件中、{{.Start}}〜{{.End}}を表示中</p>
   <table class="table urls">
     <tr>
       <th width="80">短縮URL</th>
@@ -84,7 +85,7 @@
       <th width="100">クリック数</th>
       <th width="100">編集</th>
     </tr>
-    {{range .User.Pages}}
+    {{range .Pages}}
       <tr>
         <td><a href="/{{.Slug}}" target="_blank">/{{.Slug}}</a></td>
         <td>
@@ -107,5 +108,11 @@
       </tr>
     {{end}}
   </table>
+  {{if .PrevURL}}
+    <a href="{{.PrevURL}}" class="btn btn-default">前のページへ</a>
+  {{end}}
+  {{if .NextURL}}
+    <a href="{{.NextURL}}" class="btn btn-default">次のページへ</a>
+  {{end}}
 {{end}}
 {{end}}

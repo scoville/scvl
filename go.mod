@@ -7,6 +7,7 @@ require (
 	github.com/denisenkom/go-mssqldb v0.0.0-20190515213511-eb9f6a1743f3 // indirect
 	github.com/erikstmartin/go-testdb v0.0.0-20160219214506-8d10e4a1bae5 // indirect
 	github.com/garyburd/redigo v1.6.0
+	github.com/go-playground/form v3.1.4+incompatible
 	github.com/go-sql-driver/mysql v1.4.1 // indirect
 	github.com/gofrs/uuid v3.2.0+incompatible // indirect
 	github.com/gorilla/context v1.1.1
@@ -23,4 +24,5 @@ require (
 	github.com/tomasen/realip v0.0.0-20180522021738-f0c99a92ddce
 	golang.org/x/crypto v0.0.0-20190325154230-a5d413f7728c
 	golang.org/x/oauth2 v0.0.0-20190319182350-c85d3e98c914
+	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
 )

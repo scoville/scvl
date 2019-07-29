@@ -10,6 +10,21 @@ import (
 	"github.com/scoville/scvl/src/domain"
 )
 
+// FindPagesRequest is the request struct for FindPages()
+type FindPagesRequest struct {
+	Limit  uint `form:"limit"`
+	Offset uint `form:"offset"`
+	UserID uint `form:"-"`
+}
+
+// FindPages returns the pages
+func (e *Engine) FindPages(req *FindPagesRequest) (pages []*domain.Page, count int, err error) {
+	if req.Limit == 0 {
+		req.Limit = 20
+	}
+	return e.sqlClient.FindPages(req)
+}
+
 // FindPage returns the page
 func (e *Engine) FindPage(slug string, userID int) (page *domain.Page, err error) {
 	page, err = e.sqlClient.FindPageBySlug(slug)

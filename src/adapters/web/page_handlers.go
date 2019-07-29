@@ -2,11 +2,13 @@ package web
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
 	"strings"
 
+	"github.com/go-playground/form"
 	"github.com/gorilla/context"
 	"github.com/gorilla/mux"
 	"github.com/scoville/scvl/src/domain"
@@ -24,6 +26,41 @@ func (web *Web) pagesHandler(w http.ResponseWriter, r *http.Request) {
 	user, ok := context.Get(r, "user").(*domain.User)
 	if ok {
 		resp["User"] = user
+	}
+	var req engine.FindPagesRequest
+	err := form.NewDecoder().Decode(&req, r.URL.Query())
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	req.UserID = user.ID
+	pages, count, err := web.engine.FindPages(&req)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	resp["Pages"] = pages
+	resp["Count"] = count
+	start := req.Offset + 1
+	if start < 1 {
+		start = 1
+	}
+	resp["Start"] = start
+	end := req.Offset + req.Limit
+	if end > uint(count) {
+		end = uint(count)
+	}
+	resp["End"] = end
+	if req.Offset > 0 {
+		prevOffset := req.Offset - req.Limit
+		if prevOffset < 0 {
+			prevOffset = 0
+		}
+		resp["PrevURL"] = fmt.Sprintf("/pages?offset=%d&limit=%d", prevOffset, req.Limit)
+	}
+	if req.Offset+req.Limit < uint(count) {
+		nextOffset := req.Offset + req.Limit
+		resp["NextURL"] = fmt.Sprintf("/pages?offset=%d&limit=%d", nextOffset, req.Limit)
 	}
 	loginURL, ok := context.Get(r, "login_url").(string)
 	if ok {
