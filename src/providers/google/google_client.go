@@ -3,6 +3,7 @@ package google
 import (
 	"encoding/json"
 
+	"github.com/Iwark/spreadsheet"
 	"github.com/scoville/scvl/src/domain"
 	"github.com/scoville/scvl/src/engine"
 	"golang.org/x/oauth2"
@@ -24,6 +25,7 @@ func NewClient(clientID, clientSecret, redirectURL string) engine.GoogleClient {
 				"https://www.googleapis.com/auth/userinfo.profile",
 				"https://www.googleapis.com/auth/userinfo.email",
 				"https://www.googleapis.com/auth/drive.metadata.readonly",
+				spreadsheet.Scope,
 			},
 			Endpoint: google.Endpoint,
 		},
@@ -69,6 +71,18 @@ func (c *googleClient) GetDriveFileTitle(user *domain.User, id string) (title st
 	err = json.NewDecoder(resp.Body).Decode(&m)
 	title = m["name"]
 	return
+}
+
+func (c *googleClient) FetchSpreadsheet(user *domain.User, id string) (ss spreadsheet.Spreadsheet, err error) {
+	tok := &oauth2.Token{}
+	err = json.Unmarshal([]byte(user.GoogleToken), tok)
+	if err != nil {
+		return
+	}
+	client := c.config.Client(oauth2.NoContext, tok)
+
+	service := spreadsheet.NewServiceWithClient(client)
+	return service.FetchSpreadsheet(id)
 }
 
 func (c *googleClient) AuthCodeURL(state string) string {

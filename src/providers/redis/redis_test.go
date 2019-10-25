@@ -1,6 +1,8 @@
 package redis
 
-import "testing"
+import (
+	"testing"
+)
 
 const testRedisDB = 999
 

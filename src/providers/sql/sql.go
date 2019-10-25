@@ -20,7 +20,7 @@ func NewClient(dbURL string) (engine.SQLClient, error) {
 		return nil, err
 	}
 	db.AutoMigrate(
-		&domain.Email{},
+		&domain.FileEmail{},
 		&domain.FileDownload{},
 		&domain.File{},
 		&domain.Image{},
@@ -28,6 +28,9 @@ func NewClient(dbURL string) (engine.SQLClient, error) {
 		&domain.PageView{},
 		&domain.Page{},
 		&domain.User{},
+		&domain.EmailTemplate{},
+		&domain.BatchEmail{},
+		&domain.Email{},
 	)
 	return &client{db}, nil
 }
