@@ -2,7 +2,6 @@ package web
 
 import (
 	"html/template"
-	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -25,7 +24,6 @@ func renderTemplate(w http.ResponseWriter, r *http.Request, path string, data ma
 		data["User"] = user
 		data["UserSignedIn"] = true
 	}
-	log.Println(r.Host)
 	data["IsMainHost"] = (r.Host == os.Getenv("MAIN_DOMAIN"))
 	data["IsFileHost"] = (r.Host == os.Getenv("FILE_DOMAIN"))
 	data["IsImageHost"] = (r.Host == os.Getenv("IMAGE_DOMAIN"))

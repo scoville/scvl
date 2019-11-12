@@ -2,6 +2,8 @@ package google
 
 import (
 	"encoding/json"
+	"io/ioutil"
+	"log"
 
 	"github.com/Iwark/spreadsheet"
 	"github.com/scoville/scvl/src/domain"
@@ -68,7 +70,14 @@ func (c *googleClient) GetDriveFileTitle(user *domain.User, id string) (title st
 	}
 	defer resp.Body.Close()
 	var m map[string]string
-	err = json.NewDecoder(resp.Body).Decode(&m)
+	b, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return
+	}
+	err = json.Unmarshal(b, &m)
+	if err != nil {
+		log.Println(string(b))
+	}
 	title = m["name"]
 	return
 }

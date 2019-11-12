@@ -215,12 +215,14 @@ func (e *Engine) fetchTitle(userID int, url string) (title string, err error) {
 	if err != nil {
 		return
 	}
-	if strings.HasPrefix(url, "https://docs.google.com/") {
+	if strings.HasPrefix(url, "https://docs.google.com/") && !strings.HasPrefix(url, "https://docs.google.com/forms/") {
 		paths := strings.Split(url, "/")
 		if len(paths) > 5 {
 			title, err = e.googleClient.GetDriveFileTitle(user, paths[5])
 		}
-		return
+		if err == nil {
+			return
+		}
 	}
 	var resp *http.Response
 	resp, err = http.Get("https://ogp.en-courage.com?url=" + url)

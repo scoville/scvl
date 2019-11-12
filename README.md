@@ -21,4 +21,4 @@ DB_URL="root:@/scvl_development?charset=utf8&parseTime=True&loc=Local"
 ALLOWED_DOMAINS="sc0ville.com,en-courage.com,en-courage.net"
 ```
 
-Website: [scvl.site](http://scvl.site)
+Website: [scvl.site](https://scvl.site)
