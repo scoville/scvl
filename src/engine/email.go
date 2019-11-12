@@ -18,6 +18,13 @@ type CreateEmailRequest struct {
 	User           *domain.User
 }
 
+// SendEmailRequest is the request for sending an email
+type SendEmailRequest struct {
+	ToAddresses  []*string
+	BccAddresses []*string
+	Body         string
+}
+
 // CreateEmail creates an email
 func (e *Engine) CreateEmail(req *CreateEmailRequest) (emailTemplate *domain.EmailTemplate, err error) {
 
@@ -69,7 +76,18 @@ func (e *Engine) CreateEmail(req *CreateEmailRequest) (emailTemplate *domain.Ema
 		if err != nil {
 			return
 		}
+		// validate max display number
+		if len(emailTemplate.BatchEmail.Emails) == 3 {
+			break
+		}
 		emailTemplate.BatchEmail.Emails = append(emailTemplate.BatchEmail.Emails, email)
 	}
+	return
+}
+
+// SendEmail send a email
+func (e *Engine) SendEmail(req *SendEmailRequest) (err error) {
+	// Todo add data processing & validation
+	err = e.awsClient.SendGroupMails(req.ToAddresses, req.BccAddresses, req.Body)
 	return
 }

@@ -50,3 +50,19 @@ func (web *Web) emailCreateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	renderTemplate(w, r, "/email_preview.tpl", resp)
 }
+
+func (web *Web) emailSendHandler(w http.ResponseWriter, r *http.Request) {
+	var req engine.SendEmailRequest
+	_, ok := context.Get(r, "user").(*domain.User)
+	if !ok {
+		log.Println("failed to get user from the context")
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+	err := web.engine.SendEmail(&req)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+}

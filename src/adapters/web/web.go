@@ -48,6 +48,7 @@ func (web *Web) Start(port string) error {
 
 	r.Handle("/emails", web.authenticate(web.emailsHandler)).Methods(http.MethodGet)
 	r.Handle("/emails", web.authenticate(web.emailCreateHandler)).Methods(http.MethodPost)
+	r.Handle("/emails/send", web.authenticate(web.emailSendHandler)).Methods(http.MethodPost)
 
 	r.HandleFunc("/{slug}/qr.png", web.qrHandler).Methods(http.MethodGet)
 	r.Handle("/{slug}/edit", web.authenticate(web.editHandler)).Methods(http.MethodGet)

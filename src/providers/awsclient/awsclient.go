@@ -107,7 +107,7 @@ func (c *awsClient) DownloadFromS3(path string) (data []byte, err error) {
 	return
 }
 
-func (c *awsClient) SendMail(file *domain.File, password string) error {
+func (c *awsClient) SendFileMail(file *domain.File, password string) error {
 	if file.Email == nil {
 		return errors.New("Email is empty")
 	}
@@ -176,6 +176,31 @@ func (c *awsClient) SendMail(file *domain.File, password string) error {
 			},
 		},
 		Source: aws.String(c.mailFrom.String()),
+	})
+	return err
+}
+
+func (c *awsClient) SendGroupMails(toAddresses, bccAddresses []*string, body string) error {
+	// TODO sendMail()を作って再利用できるようにしたい
+	svc := ses.New(c.svc, aws.NewConfig().WithRegion(c.sesRegion))
+	_, err := svc.SendEmail(&ses.SendEmailInput{
+		Destination: &ses.Destination{
+			ToAddresses:  toAddresses,
+			BccAddresses: bccAddresses,
+		},
+		Message: &ses.Message{
+			Body: &ses.Body{
+				Html: &ses.Content{
+					Charset: aws.String("UTF-8"),
+					Data:    aws.String(body),
+				},
+			},
+			// TODO Subject名を決める
+			Subject: &ses.Content{
+				Charset: aws.String("UTF-8"),
+				Data:    aws.String("メールだよ"),
+			},
+		},
 	})
 	return err
 }
