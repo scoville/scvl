@@ -180,27 +180,39 @@ func (c *awsClient) SendFileMail(file *domain.File, password string) error {
 	return err
 }
 
-func (c *awsClient) SendGroupMails(toAddresses, bccAddresses []*string, body string) error {
-	// TODO sendMail()を作って再利用できるようにしたい
+func (c *awsClient) SendGroupMails(emails []*domain.Email, sender string) (err error) {
 	svc := ses.New(c.svc, aws.NewConfig().WithRegion(c.sesRegion))
+	errChan := make(chan error)
+	for _, email := range emails {
+		go sendEmail(svc, email, sender, errChan)
+		select {
+		case err = <-errChan:
+			return
+		}
+	}
+	return
+}
+
+// Todo: SendFileNameでも使えるようにする
+func sendEmail(svc *ses.SES, email *domain.Email, sender string, errChan chan error) {
 	_, err := svc.SendEmail(&ses.SendEmailInput{
 		Destination: &ses.Destination{
-			ToAddresses:  toAddresses,
-			BccAddresses: bccAddresses,
+			ToAddresses:  []*string{&email.To},
+			BccAddresses: []*string{&sender},
 		},
 		Message: &ses.Message{
 			Body: &ses.Body{
 				Html: &ses.Content{
 					Charset: aws.String("UTF-8"),
-					Data:    aws.String(body),
+					Data:    aws.String(email.Body),
 				},
 			},
-			// TODO Subject名を決める
 			Subject: &ses.Content{
 				Charset: aws.String("UTF-8"),
-				Data:    aws.String("メールだよ"),
+				Data:    aws.String(email.Title),
 			},
 		},
 	})
-	return err
+	errChan <- err
+	return
 }

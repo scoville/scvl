@@ -28,6 +28,23 @@ type SendEmailRequest struct {
 // CreateEmail creates an email
 func (e *Engine) CreateEmail(req *CreateEmailRequest) (emailTemplate *domain.EmailTemplate, err error) {
 
+	emailTemplate, err = createEmailTemplate(e, req)
+	return
+}
+
+// SendEmail send a email
+func (e *Engine) SendEmail(req *CreateEmailRequest) (err error) {
+	// Todo add data processing & validation
+	emailTemplate, err := createEmailTemplate(e, req)
+	if err != nil {
+		return
+	}
+
+	err = e.awsClient.SendGroupMails(emailTemplate.BatchEmail.Emails, emailTemplate.BatchEmail.Sender)
+	return
+}
+
+func createEmailTemplate(e *Engine, req *CreateEmailRequest) (emailTemplate *domain.EmailTemplate, err error) {
 	splitted := strings.Split(req.SpreadsheetURL, "/")
 	if len(splitted) < 6 {
 		err = errors.New("invalid spreadsheet url")
@@ -50,6 +67,7 @@ func (e *Engine) CreateEmail(req *CreateEmailRequest) (emailTemplate *domain.Ema
 	emailTemplate = &domain.EmailTemplate{
 		UserID: int(req.User.ID),
 		Body:   req.Template,
+		Title:  req.Title,
 		BatchEmail: &domain.BatchEmail{
 			Sender:         req.Sender,
 			SpreadsheetURL: req.SpreadsheetURL,
@@ -76,18 +94,7 @@ func (e *Engine) CreateEmail(req *CreateEmailRequest) (emailTemplate *domain.Ema
 		if err != nil {
 			return
 		}
-		// validate max display number
-		if len(emailTemplate.BatchEmail.Emails) == 3 {
-			break
-		}
 		emailTemplate.BatchEmail.Emails = append(emailTemplate.BatchEmail.Emails, email)
 	}
-	return
-}
-
-// SendEmail send a email
-func (e *Engine) SendEmail(req *SendEmailRequest) (err error) {
-	// Todo add data processing & validation
-	err = e.awsClient.SendGroupMails(req.ToAddresses, req.BccAddresses, req.Body)
-	return
+	return emailTemplate, nil
 }

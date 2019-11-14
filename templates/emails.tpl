@@ -20,6 +20,10 @@
         <input type="text" name="sender" value="{{.User.Name}} <{{.User.Email}}>" class="form-control" required />
       </div>
       <div class="form-group">
+        <label for="title">タイトル</label>
+        <input type="text" name="title" value="タイトル" class="form-control" required />
+      </div>
+      <div class="form-group">
         <label for="template">テンプレート</label>
         <textarea name="template"class="form-control" required>
 [[name]] 様
