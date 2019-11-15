@@ -11,5 +11,5 @@ type AWSClient interface {
 	UploadToS3(io.ReadSeeker, string) error
 	DownloadFromS3(string) ([]byte, error)
 	SendFileMail(*domain.File, string) error
-	SendGroupMails([]*domain.Email, string) error
+	SendGroupEmails([]*domain.Email, string) error
 }

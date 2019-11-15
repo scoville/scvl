@@ -7,7 +7,7 @@ import (
 )
 
 // NewEmail initializes the email and return it
-func NewEmail(template string, to string, title string, variables map[string]string) (email *Email, err error) {
+func NewEmail(template, to, title string, variables map[string]string) (email *Email, err error) {
 	email = &Email{}
 	email.Body = template
 	email.To = to

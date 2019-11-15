@@ -180,7 +180,7 @@ func (c *awsClient) SendFileMail(file *domain.File, password string) error {
 	return err
 }
 
-func (c *awsClient) SendGroupMails(emails []*domain.Email, sender string) (err error) {
+func (c *awsClient) SendGroupEmails(emails []*domain.Email, sender string) (err error) {
 	svc := ses.New(c.svc, aws.NewConfig().WithRegion(c.sesRegion))
 	errChan := make(chan error)
 	for _, email := range emails {

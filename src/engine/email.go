@@ -40,7 +40,7 @@ func (e *Engine) SendEmail(req *CreateEmailRequest) (err error) {
 		return
 	}
 
-	err = e.awsClient.SendGroupMails(emailTemplate.BatchEmail.Emails, emailTemplate.BatchEmail.Sender)
+	err = e.awsClient.SendGroupEmails(emailTemplate.BatchEmail.Emails, emailTemplate.BatchEmail.Sender)
 	return
 }
 
