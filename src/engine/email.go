@@ -34,7 +34,10 @@ func (e *Engine) CreateEmail(req *CreateEmailRequest) (emailTemplate *domain.Ema
 
 // SendEmail send a email
 func (e *Engine) SendEmail(req *CreateEmailRequest) (err error) {
-	// Todo add data processing & validation
+	// base64でエンコード済みの透過gifを本文に追加
+	const openConfirmationCode = "<img src=\"data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7\">"
+	req.Template = req.Template + openConfirmationCode
+
 	emailTemplate, err := createEmailTemplate(e, req)
 	if err != nil {
 		return
