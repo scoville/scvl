@@ -30,4 +30,7 @@ type SQLClient interface {
 	CreateFileEmail(email *domain.FileEmail) error
 
 	CreateImage(image *domain.Image) error
+
+	CreateEmail(email *domain.Email) error
+	ReadEmail(emailID string) error
 }

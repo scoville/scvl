@@ -2,6 +2,7 @@ package engine
 
 import (
 	"errors"
+	"strconv"
 	"strings"
 
 	"github.com/scoville/scvl/src/domain"
@@ -34,16 +35,30 @@ func (e *Engine) CreateEmail(req *CreateEmailRequest) (emailTemplate *domain.Ema
 
 // SendEmail send a email
 func (e *Engine) SendEmail(req *CreateEmailRequest) (err error) {
-	// base64でエンコード済みの透過gifを本文に追加
-	const openConfirmationCode = "<img src=\"data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7\">"
-	req.Template = req.Template + openConfirmationCode
-
 	emailTemplate, err := createEmailTemplate(e, req)
 	if err != nil {
 		return
 	}
-
+	// base64でエンコード済みの透過gifを本文に追加
+	emailID := strconv.Itoa(int(emailTemplate.ID))
+	openConfirmationCode := "<img src=\"https://scvl.site/emails/read/?id=" + emailID + "\">"
+	req.Template = req.Template + openConfirmationCode
 	err = e.awsClient.SendGroupEmails(emailTemplate.BatchEmail.Emails, emailTemplate.BatchEmail.Sender)
+	if err != nil {
+		return
+	}
+	for _, email := range emailTemplate.BatchEmail.Emails {
+		err = e.sqlClient.CreateEmail(email)
+		if err != nil {
+			return
+		}
+	}
+	return
+}
+
+// ReadEmail update emails opened_at
+func (e *Engine) ReadEmail(emailID string) (err error) {
+	err = e.sqlClient.ReadEmail(emailID)
 	return
 }
 

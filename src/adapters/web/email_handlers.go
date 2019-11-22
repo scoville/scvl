@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/context"
+	"github.com/gorilla/mux"
 	"github.com/scoville/scvl/src/domain"
 	"github.com/scoville/scvl/src/engine"
 )
@@ -72,4 +73,18 @@ func (web *Web) emailSendHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+func (web *Web) emailReadHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	emailID := vars["email_id"]
+	err := web.engine.ReadEmail(emailID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-type", "image/gif")
+	w.WriteHeader(http.StatusOK)
+	// 透過gifを返す
+	w.Write([]byte("data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"))
 }
