@@ -18,14 +18,14 @@ type UserInvitation struct {
 
 // Invitation statuses
 const (
-	InvitationSent    = "sent"
-	InvitationUsed    = "used"
-	InvitationDeleted = "deleted"
+	InvitationStatusSent    = "sent"
+	InvitationStatusUsed    = "used"
+	InvitationStatusDeleted = "deleted"
 )
 
 // BeforeCreate generates a unique hash for the invitation.
 func (i *UserInvitation) BeforeCreate() error {
 	i.Hash = GenerateSlug(64)
-	i.Status = InvitationSent
+	i.Status = InvitationStatusSent
 	return nil
 }

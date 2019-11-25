@@ -9,7 +9,7 @@ import (
 
 // FindUser finds and returns the user
 func (e *Engine) FindUser(userID uint) (*domain.User, error) {
-	return e.sqlClient.FindUser(userID)
+	return e.sqlClient.FindUser(&domain.User{ID: userID})
 }
 
 // FindOrCreateUserByGoogleCode finds or creates the user
@@ -32,7 +32,7 @@ type InviteRequest struct {
 
 // InviteUser deals new user which is invited by existing user
 func (e *Engine) InviteUser(req *InviteRequest) (*domain.UserInvitation, error) {
-	if _, err := e.sqlClient.FindUser(req.FromUserID); err != nil {
+	if _, err := e.sqlClient.FindUser(&domain.User{ID: req.FromUserID}); err != nil {
 		return nil, err
 	}
 	paramas := &domain.UserInvitation{
@@ -52,15 +52,42 @@ type RegistrationRequest struct {
 	Password string
 }
 
-// CreateUser creates the user who is invited to the system.
+// UserRegister creates the user who is invited to the system.
 func (e *Engine) UserRegister(req *RegistrationRequest) (*domain.User, error) {
-	if _, err := e.sqlClient.FindInvitation(req.Hash); err != nil {
+	invitation, err := e.sqlClient.FindInvitation(req.Hash)
+	if err != nil {
 		return nil, err
 	}
-	// Todo: invitationを使用済みにする
-	paramas := &domain.User{
-		// Password: req.Password, // passwordを追加するかどうか問題。
+	updatedInvitation, err := e.sqlClient.UpdateInvitation(invitation, &domain.UserInvitation{
+		Status: domain.InvitationStatusUsed,
+	})
+	if err != nil {
+		return nil, err
 	}
-	user, err := e.sqlClient.UserRegister(paramas)
-	return user, err
+	user := updatedInvitation.ToUser
+	if user.Email != req.Email {
+		return nil, fmt.Errorf("email is invalid")
+	}
+	// todo encrypt実装
+	encryptedPassword := req.Password
+	registeredUser, err := e.sqlClient.UserRegister(user, &domain.User{
+		EncryptedPassword: encryptedPassword,
+	})
+	return registeredUser, err
+}
+
+// LoginUserRequest is the Reqeust
+type LoginUserRequest struct {
+	Email    string
+	Password string
+}
+
+// LoginUser is login request
+func (e *Engine) LoginUser(req *LoginUserRequest) (*domain.User, error) {
+	// todo: encrypt実装
+	encryptedPassword := req.Password
+	return e.sqlClient.FindUser(&domain.User{
+		Email:             req.Email,
+		EncryptedPassword: encryptedPassword,
+	})
 }

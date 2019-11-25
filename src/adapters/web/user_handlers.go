@@ -36,5 +36,16 @@ func (web *Web) userRegistrationHandler(w http.ResponseWriter, r *http.Request) 
 }
 
 func (web *Web) loginHandler(w http.ResponseWriter, r *http.Request) {
-
+	session, _ := web.store.Get(r, "scvl")
+	user, err := web.engine.LoginUser(&engine.LoginUserRequest{
+		Email:    r.FormValue("email"),
+		Password: r.FormValue("password"),
+	})
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
+	session.Values["user_id"] = user.ID
+	session.Save(r, w)
+	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 }

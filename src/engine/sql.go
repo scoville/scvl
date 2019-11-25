@@ -6,11 +6,12 @@ import "github.com/scoville/scvl/src/domain"
 type SQLClient interface {
 	Close() error
 
-	FindUser(uint) (*domain.User, error)
+	FindUser(*domain.User) (*domain.User, error)
 	FindOrCreateUser(domain.User) (*domain.User, error)
 	CreateInvitation(*domain.UserInvitation) (*domain.UserInvitation, error)
 	FindInvitation(string) (*domain.UserInvitation, error)
-	UserRegister(*domain.User) (*domain.User, error)
+	UpdateInvitation(*domain.UserInvitation, *domain.UserInvitation) (*domain.UserInvitation, error)
+	UserRegister(*domain.User, *domain.User) (*domain.User, error)
 
 	FindPages(params *FindPagesRequest) (pages []*domain.Page, count int, err error)
 	FindPageBySlug(string) (*domain.Page, error)

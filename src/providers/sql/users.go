@@ -7,7 +7,7 @@ import (
 
 const tblUsers = "users"
 
-func (c *client) FindUser(id uint) (user *domain.User, err error) {
+func (c *client) FindUser(cond *domain.User) (user *domain.User, err error) {
 	user = &domain.User{}
 
 	err = c.db.Table(tblUsers).
@@ -17,7 +17,7 @@ func (c *client) FindUser(id uint) (user *domain.User, err error) {
 		Preload("Images", func(db *gorm.DB) *gorm.DB {
 			return db.Order("images.created_at DESC")
 		}).
-		First(user, id).Error
+		First(user, cond).Error
 	if err != nil {
 		return
 	}
@@ -39,7 +39,14 @@ func (c *client) FindOrCreateUser(params domain.User) (user *domain.User, err er
 
 func (c *client) FindInvitation(hash string) (*domain.UserInvitation, error) {
 	invitation := &domain.UserInvitation{}
-	err := c.db.First(invitation, "hash = ?", hash).Error
+	err := c.db.Table(tblUsers).
+		Preload("ToUser", func(db *gorm.DB) *gorm.DB {
+			return db.Order("to_user.created_at DESC")
+		}).First(invitation, "hash = ?", hash).Error
+	return invitation, err
+}
+func (c *client) UpdateInvitation(invitation, params *domain.UserInvitation) (*domain.UserInvitation, error) {
+	err := c.db.Model(invitation).Updates(params).Error
 	return invitation, err
 }
 func (c *client) CreateInvitation(params *domain.UserInvitation) (*domain.UserInvitation, error) {
@@ -47,7 +54,7 @@ func (c *client) CreateInvitation(params *domain.UserInvitation) (*domain.UserIn
 	return params, err
 }
 
-func (c *client) UserRegister(params *domain.User) (*domain.User, error) {
-	err := c.db.Create(params).Error
-	return params, err
+func (c *client) UserRegister(user, params *domain.User) (*domain.User, error) {
+	err := c.db.Model(user).Update(params).Error
+	return user, err
 }

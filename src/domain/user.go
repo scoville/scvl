@@ -11,7 +11,8 @@ type User struct {
 	Name      string     `json:"name"`
 	Email     string     `json:"email" gorm:"type:varchar(100);unique_index"`
 
-	Files       []*File  `json:"files"`
-	Images      []*Image `json:"images"`
-	GoogleToken string   `json:"google_token"`
+	Files             []*File  `json:"files"`
+	Images            []*Image `json:"images"`
+	GoogleToken       string   `json:"google_token"`
+	EncryptedPassword string   `json:"password"`
 }
