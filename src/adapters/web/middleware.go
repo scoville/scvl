@@ -12,6 +12,8 @@ func (web *Web) authenticate(h http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		session, _ := web.store.Get(r, "scvl")
 		userID, ok := session.Values["user_id"].(uint)
+		// userID = 1
+		// ok = true
 		if ok {
 			user, err := web.engine.FindUser(userID)
 			if err != nil || user.GoogleToken == "" {

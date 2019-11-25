@@ -24,9 +24,11 @@ func (web *Web) pagesHandler(w http.ResponseWriter, r *http.Request) {
 		json.Unmarshal(bytes, &resp)
 	}
 	user, ok := context.Get(r, "user").(*domain.User)
-	if ok {
-		resp["User"] = user
+	if !ok {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
 	}
+	resp["User"] = user
 	var req engine.FindPagesRequest
 	err := form.NewDecoder().Decode(&req, r.URL.Query())
 	if err != nil {

@@ -36,3 +36,18 @@ func (c *client) FindOrCreateUser(params domain.User) (user *domain.User, err er
 		FirstOrCreate(user).Error
 	return
 }
+
+func (c *client) FindInvitation(hash string) (*domain.UserInvitation, error) {
+	invitation := &domain.UserInvitation{}
+	err := c.db.First(invitation, "hash = ?", hash).Error
+	return invitation, err
+}
+func (c *client) CreateInvitation(params *domain.UserInvitation) (*domain.UserInvitation, error) {
+	err := c.db.Create(params).Error
+	return params, err
+}
+
+func (c *client) UserRegister(params *domain.User) (*domain.User, error) {
+	err := c.db.Create(params).Error
+	return params, err
+}
