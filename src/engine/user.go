@@ -22,7 +22,6 @@ func (e *Engine) FindOrCreateUserByGoogleCode(code string) (*domain.User, error)
 	if e.allowedDomain != "" && !strings.HasSuffix(u.Email, "@"+e.allowedDomain) {
 		return nil, fmt.Errorf("only %s can allowed to use this service", e.allowedDomain)
 	}
-	u.Status = domain.UserStatusValid
 	return e.sqlClient.FindOrCreateUser(u)
 }
 
