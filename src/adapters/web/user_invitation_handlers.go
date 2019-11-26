@@ -8,7 +8,7 @@ import (
 	"github.com/scoville/scvl/src/engine"
 )
 
-func (web *Web) userInvitationHandler(w http.ResponseWriter, r *http.Request) {
+func (web *Web) invitationCreateHandler(w http.ResponseWriter, r *http.Request) {
 	user, ok := context.Get(r, "user").(*domain.User)
 	if !ok {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
@@ -18,17 +18,15 @@ func (web *Web) userInvitationHandler(w http.ResponseWriter, r *http.Request) {
 		FromUserID: uint(user.ID),
 		Email:      r.FormValue("email"),
 	})
-	http.Redirect(w, r, "/", http.StatusCreated)
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
-func (web *Web) invitationPageHandler(w http.ResponseWriter, r *http.Request) {
-	user, ok := context.Get(r, "user").(*domain.User)
+func (web *Web) invitationsHandler(w http.ResponseWriter, r *http.Request) {
+	_, ok := context.Get(r, "user").(*domain.User)
 	if !ok {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
-	resp := map[string]interface{}{
-		"FromUserID": user.ID,
-	}
+	resp := map[string]interface{}{}
 	renderTemplate(w, r, "/invite.tpl", resp)
 }

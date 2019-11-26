@@ -12,7 +12,7 @@ type User struct {
 	UpdatedAt time.Time
 	DeletedAt *time.Time `sql:"index"`
 	Name      string     `json:"name"`
-	Email     string     `json:"email" gorm:"type:varchar(100);unique_index"`
+	Email     string     `json:"email" gorm:"type:varchar(100);unique_index; not null"`
 
 	Files             []*File  `json:"files"`
 	Images            []*Image `json:"images"`

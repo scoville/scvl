@@ -19,8 +19,9 @@ func (web *Web) userRegistrationHandler(w http.ResponseWriter, r *http.Request) 
 	session, _ := web.store.Get(r, "scvl")
 	session.Values["user_id"] = user.ID
 	session.Save(r, w)
-	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
+
 func (web *Web) userRegistrationPageHandler(w http.ResponseWriter, r *http.Request) {
 	hash := mux.Vars(r)["hash"]
 	invitation, err := web.engine.FindInvitation(&engine.FindInvitationRequest{
@@ -49,5 +50,5 @@ func (web *Web) loginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	session.Values["user_id"] = user.ID
 	session.Save(r, w)
-	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }

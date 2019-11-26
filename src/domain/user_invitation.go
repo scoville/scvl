@@ -35,11 +35,11 @@ func (i *UserInvitation) BeforeCreate() error {
 }
 
 // Valid returns Error if the invitation is not valid
-func (w *UserInvitation) Valid() error {
-	if w.Status == InvitationStatusUsed {
+func (i *UserInvitation) Valid() error {
+	if i.Status == InvitationStatusUsed {
 		return fmt.Errorf("the invitation is already used")
 	}
-	if time.Now().Sub(w.CreatedAt) > time.Hour*24 {
+	if time.Now().Sub(i.CreatedAt) > time.Hour*24 {
 		return fmt.Errorf("the invitation is expired")
 	}
 	return nil

@@ -45,10 +45,10 @@ func (web *Web) Start(port string) error {
 	r.HandleFunc("/files/{slug}", web.authenticate(web.updateFileHandler)).Methods(http.MethodPost, http.MethodPut, http.MethodPatch)
 	r.Handle("/images", web.authenticate(web.imagesHandler)).Methods(http.MethodGet)
 	r.Handle("/images", web.authenticate(web.imageUploadHandler)).Methods(http.MethodPost)
-	r.Handle("/invite", web.authenticate(web.userInvitationHandler)).Methods(http.MethodPost)
-	r.Handle("/invite", web.authenticate(web.invitationPageHandler)).Methods(http.MethodGet)
-	r.HandleFunc("/register", web.userRegistrationHandler).Methods(http.MethodPost)
+	r.Handle("/invites", web.authenticate(web.invitationsHandler)).Methods(http.MethodGet)
+	r.Handle("/invites", web.authenticate(web.invitationCreateHandler)).Methods(http.MethodPost)
 	r.HandleFunc("/register/{hash}", web.userRegistrationPageHandler).Methods(http.MethodGet)
+	r.HandleFunc("/register", web.userRegistrationHandler).Methods(http.MethodPost)
 	r.HandleFunc("/login", web.loginHandler).Methods(http.MethodPost)
 
 	r.HandleFunc("/{slug}/qr.png", web.qrHandler).Methods(http.MethodGet)

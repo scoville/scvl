@@ -12,5 +12,10 @@
       <a href="{{.ImageHost}}">Image Uploader</a>
     </li>
   </ul>
+  <ul class="menu">
+    <li>
+      <a href="{{.MainHost}}/invites">Invite User</a>
+    </li>
+  </ul>
 </div>
 {{end}}

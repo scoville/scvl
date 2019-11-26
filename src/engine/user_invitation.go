@@ -11,7 +11,12 @@ type FindInvitationRequest struct {
 
 // FindInvitation find the user invitation by hash
 func (e *Engine) FindInvitation(req *FindInvitationRequest) (*domain.UserInvitation, error) {
-	return e.sqlClient.FindInvitation(req.Hash)
+	invitation, err := e.sqlClient.FindInvitation(req.Hash)
+	if err != nil {
+		return nil, err
+	}
+	err = invitation.Valid()
+	return invitation, err
 }
 
 // InviteRequest is the request
@@ -33,5 +38,9 @@ func (e *Engine) InviteUser(req *InviteRequest) (*domain.UserInvitation, error) 
 		},
 	}
 	invitation, err := e.sqlClient.CreateInvitation(paramas)
+	if err != nil {
+		return nil, err
+	}
+	// todo: メール送信
 	return invitation, err
 }
