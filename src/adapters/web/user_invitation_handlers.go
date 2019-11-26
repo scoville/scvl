@@ -2,6 +2,7 @@ package web
 
 import (
 	"net/http"
+	"os"
 
 	"github.com/gorilla/context"
 	"github.com/scoville/scvl/src/domain"
@@ -14,11 +15,19 @@ func (web *Web) invitationCreateHandler(w http.ResponseWriter, r *http.Request) 
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
-	web.engine.InviteUser(&engine.InviteRequest{
+	invitation, err := web.engine.InviteUser(&engine.InviteRequest{
 		FromUserID: uint(user.ID),
 		Email:      r.FormValue("email"),
 	})
-	http.Redirect(w, r, "/", http.StatusSeeOther)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
+		return
+	}
+	url := "https://" + os.Getenv("MAIN_DOMAIN") + "/register/" + invitation.Hash
+	resp := map[string]interface{}{
+		"InvitationURL": url,
+	}
+	renderTemplate(w, r, "/invitation.tpl", resp)
 }
 
 func (web *Web) invitationsHandler(w http.ResponseWriter, r *http.Request) {
@@ -28,5 +37,5 @@ func (web *Web) invitationsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	resp := map[string]interface{}{}
-	renderTemplate(w, r, "/invite.tpl", resp)
+	renderTemplate(w, r, "/invitations.tpl", resp)
 }

@@ -30,17 +30,12 @@ func (e *Engine) InviteUser(req *InviteRequest) (*domain.UserInvitation, error) 
 	if _, err := e.sqlClient.FindUser(&domain.User{ID: req.FromUserID}); err != nil {
 		return nil, err
 	}
-	paramas := &domain.UserInvitation{
+	invitation := &domain.UserInvitation{
 		FromUserID: req.FromUserID,
 		ToUser: &domain.User{
 			Status: domain.UserStatusTemp,
 			Email:  req.Email,
 		},
 	}
-	invitation, err := e.sqlClient.CreateInvitation(paramas)
-	if err != nil {
-		return nil, err
-	}
-	// todo: メール送信
-	return invitation, err
+	return e.sqlClient.CreateInvitation(invitation)
 }
