@@ -3,36 +3,38 @@ package web
 import (
 	"net/http"
 
-	"github.com/gorilla/context"
 	"github.com/gorilla/mux"
-	"github.com/scoville/scvl/src/domain"
 	"github.com/scoville/scvl/src/engine"
 )
 
-func (web *Web) userInvitationHandler(w http.ResponseWriter, r *http.Request) {
-	user, ok := context.Get(r, "user").(*domain.User)
-	if !ok {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
-		return
-	}
-	web.engine.InviteUser(&engine.InviteRequest{
-		FromUserID: uint(user.ID),
-		Email:      r.FormValue("email"),
-	})
-	http.Redirect(w, r, "/", http.StatusCreated)
-}
-
 func (web *Web) userRegistrationHandler(w http.ResponseWriter, r *http.Request) {
-	hash := mux.Vars(r)["hash"]
-	if hash == "" {
-		http.Error(w, "invalid request", http.StatusUnprocessableEntity)
-		return
-	}
-	web.engine.UserRegister(&engine.RegistrationRequest{
-		Hash:     hash,
-		Email:    r.FormValue("hash"),
+	user, err := web.engine.UserRegister(&engine.RegistrationRequest{
+		Hash:     r.FormValue("hash"),
 		Password: r.FormValue("password"),
 	})
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
+		return
+	}
+	session, _ := web.store.Get(r, "scvl")
+	session.Values["user_id"] = user.ID
+	session.Save(r, w)
+	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+}
+func (web *Web) userRegistrationPageHandler(w http.ResponseWriter, r *http.Request) {
+	hash := mux.Vars(r)["hash"]
+	invitation, err := web.engine.FindInvitation(&engine.FindInvitationRequest{
+		Hash: hash,
+	})
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
+		return
+	}
+	resp := map[string]interface{}{
+		"Email": invitation.ToUser.Email,
+		"Hash":  hash,
+	}
+	renderTemplate(w, r, "/register.tpl", resp)
 }
 
 func (web *Web) loginHandler(w http.ResponseWriter, r *http.Request) {

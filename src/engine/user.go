@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/scoville/scvl/src/domain"
+	"golang.org/x/crypto/bcrypt"
 )
 
 // FindUser finds and returns the user
@@ -21,34 +22,13 @@ func (e *Engine) FindOrCreateUserByGoogleCode(code string) (*domain.User, error)
 	if e.allowedDomain != "" && !strings.HasSuffix(u.Email, "@"+e.allowedDomain) {
 		return nil, fmt.Errorf("only %s can allowed to use this service", e.allowedDomain)
 	}
+	u.Status = domain.UserStatusValid
 	return e.sqlClient.FindOrCreateUser(u)
-}
-
-// InviteRequest is the request
-type InviteRequest struct {
-	FromUserID uint
-	Email      string
-}
-
-// InviteUser deals new user which is invited by existing user
-func (e *Engine) InviteUser(req *InviteRequest) (*domain.UserInvitation, error) {
-	if _, err := e.sqlClient.FindUser(&domain.User{ID: req.FromUserID}); err != nil {
-		return nil, err
-	}
-	paramas := &domain.UserInvitation{
-		FromUserID: req.FromUserID,
-		ToUser: &domain.User{
-			Email: req.Email,
-		},
-	}
-	invitation, err := e.sqlClient.CreateInvitation(paramas)
-	return invitation, err
 }
 
 // RegistrationRequest is the request
 type RegistrationRequest struct {
 	Hash     string
-	Email    string
 	Password string
 }
 
@@ -58,22 +38,25 @@ func (e *Engine) UserRegister(req *RegistrationRequest) (*domain.User, error) {
 	if err != nil {
 		return nil, err
 	}
-	updatedInvitation, err := e.sqlClient.UpdateInvitation(invitation, &domain.UserInvitation{
-		Status: domain.InvitationStatusUsed,
+	if err := invitation.Valid(); err != nil {
+		return nil, err
+	}
+	user, err := e.sqlClient.FindUser(&domain.User{
+		Email:  invitation.ToUser.Email,
+		Status: domain.UserStatusTemp,
 	})
 	if err != nil {
 		return nil, err
 	}
-	user := updatedInvitation.ToUser
-	if user.Email != req.Email {
-		return nil, fmt.Errorf("email is invalid")
+	if err := user.SetPassword(req.Password); err != nil {
+		return nil, err
 	}
-	// todo encrypt実装
-	encryptedPassword := req.Password
-	registeredUser, err := e.sqlClient.UserRegister(user, &domain.User{
-		EncryptedPassword: encryptedPassword,
+	user.Status = domain.UserStatusValid
+	usedInvitation, err := e.sqlClient.UpdateInvitation(invitation, &domain.UserInvitation{
+		Status: domain.InvitationStatusUsed,
+		ToUser: user,
 	})
-	return registeredUser, err
+	return usedInvitation.ToUser, err
 }
 
 // LoginUserRequest is the Reqeust
@@ -85,9 +68,14 @@ type LoginUserRequest struct {
 // LoginUser is login request
 func (e *Engine) LoginUser(req *LoginUserRequest) (*domain.User, error) {
 	// todo: encrypt実装
-	encryptedPassword := req.Password
-	return e.sqlClient.FindUser(&domain.User{
-		Email:             req.Email,
-		EncryptedPassword: encryptedPassword,
+	user, err := e.sqlClient.FindUser(&domain.User{
+		Email: req.Email,
 	})
+	if err != nil {
+		return nil, err
+	}
+	if err := bcrypt.CompareHashAndPassword([]byte(user.EncryptedPassword), []byte(req.Password)); err != nil {
+		return nil, err
+	}
+	return user, nil
 }

@@ -1,6 +1,9 @@
 package domain
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
 
 // UserInvitation is the struct for user_invitation.
 type UserInvitation struct {
@@ -27,5 +30,17 @@ const (
 func (i *UserInvitation) BeforeCreate() error {
 	i.Hash = GenerateSlug(64)
 	i.Status = InvitationStatusSent
+	i.ToUser.SetPassword(GenerateSlug(12))
+	return nil
+}
+
+// Valid returns Error if the invitation is not valid
+func (w *UserInvitation) Valid() error {
+	if w.Status == InvitationStatusUsed {
+		return fmt.Errorf("the invitation is already used")
+	}
+	if time.Now().Sub(w.CreatedAt) > time.Hour*24 {
+		return fmt.Errorf("the invitation is expired")
+	}
 	return nil
 }

@@ -3,6 +3,13 @@
   <h1>SCVL URL Shortener</h1>
   {{if .LoginURL}}
     <a href="{{.LoginURL}}" class="login btn btn-primary btn-lg">ログイン</a>
+    <form action="/login" method="post">
+      <div class="form-inline">
+        <input id="email" type="email" name="email" class="form-control">
+        <input id="password" type="password" name="password" class="form-control">
+        <input type="submit" value="送信" class="btn btn-primary">
+      </div>
+    </form>
   {{else}}
     <p>URLの短縮ができます。</p>
     <form action="/shorten" method="post">

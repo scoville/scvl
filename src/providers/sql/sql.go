@@ -28,6 +28,7 @@ func NewClient(dbURL string) (engine.SQLClient, error) {
 		&domain.PageView{},
 		&domain.Page{},
 		&domain.User{},
+		&domain.UserInvitation{},
 	)
 	return &client{db}, nil
 }
