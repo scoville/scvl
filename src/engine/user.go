@@ -66,7 +66,6 @@ type LoginUserRequest struct {
 
 // LoginUser is login request
 func (e *Engine) LoginUser(req *LoginUserRequest) (*domain.User, error) {
-	// todo: encrypt実装
 	user, err := e.sqlClient.FindUser(&domain.User{
 		Email: req.Email,
 	})
