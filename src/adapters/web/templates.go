@@ -32,21 +32,21 @@ func renderTemplate(w http.ResponseWriter, r *http.Request, path string, data ma
 	data["MainHost"] = scheme + os.Getenv("MAIN_DOMAIN")
 	data["FileHost"] = scheme + os.Getenv("FILE_DOMAIN")
 	data["ImageHost"] = scheme + os.Getenv("IMAGE_DOMAIN")
-	tpl := findTemplate("/layouts.tpl", path)
+	tpl := findTemplate("/layouts.tpl", "/login.tpl", path)
 	tpl.ExecuteTemplate(w, "base", data)
 }
 
 // cache templates so that it doesn't parse files every time in production
-func findTemplate(basePath, path string) (tpl *template.Template) {
+func findTemplate(basePath, loginPath, path string) (tpl *template.Template) {
 	if Digest == "" {
-		tpl = template.Must(template.ParseFiles(baseTplPath+basePath, baseTplPath+path))
+		tpl = template.Must(template.ParseFiles(baseTplPath+basePath, baseTplPath+loginPath, baseTplPath+path))
 		return
 	}
 	tpl, ok := templates[path]
 	if ok {
 		return
 	}
-	tpl = template.Must(template.ParseFiles(baseTplPath+basePath, baseTplPath+path))
+	tpl = template.Must(template.ParseFiles(baseTplPath+basePath, baseTplPath+loginPath, baseTplPath+path))
 	templates[path] = tpl
 	return
 }

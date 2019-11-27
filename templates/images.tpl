@@ -2,7 +2,7 @@
 <div class="jumbotron">
   <h1>SCVL Image Uploader</h1>
   {{if .LoginURL}}
-    <a href="{{.LoginURL}}" class="login btn btn-primary btn-lg">ログイン</a>
+    {{template "login" .}}
   {{else}}
     <p>画像のアップロードができます。</p>
     <form action="/" method="post" enctype="multipart/form-data">
