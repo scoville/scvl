@@ -6,7 +6,7 @@ import "github.com/scoville/scvl/src/domain"
 type SQLClient interface {
 	Close() error
 
-	FindUser(*domain.User) (*domain.User, error)
+	FindUser(domain.User) (*domain.User, error)
 	FindOrCreateUser(domain.User) (*domain.User, error)
 	CreateInvitation(*domain.UserInvitation) (*domain.UserInvitation, error)
 	FindInvitation(string) (*domain.UserInvitation, error)

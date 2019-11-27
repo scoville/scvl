@@ -10,7 +10,7 @@ import (
 
 // FindUser finds and returns the user
 func (e *Engine) FindUser(userID uint) (*domain.User, error) {
-	return e.sqlClient.FindUser(&domain.User{ID: userID})
+	return e.sqlClient.FindUser(domain.User{ID: userID})
 }
 
 // FindOrCreateUserByGoogleCode finds or creates the user
@@ -40,7 +40,7 @@ func (e *Engine) UserRegister(req *RegistrationRequest) (*domain.User, error) {
 	if err := invitation.Valid(); err != nil {
 		return nil, err
 	}
-	user, err := e.sqlClient.FindUser(&domain.User{
+	user, err := e.sqlClient.FindUser(domain.User{
 		Email:  invitation.ToUser.Email,
 		Status: domain.UserStatusTemp,
 	})
@@ -66,7 +66,7 @@ type LoginUserRequest struct {
 
 // LoginUser is login request
 func (e *Engine) LoginUser(req *LoginUserRequest) (*domain.User, error) {
-	user, err := e.sqlClient.FindUser(&domain.User{
+	user, err := e.sqlClient.FindUser(domain.User{
 		Email: req.Email,
 	})
 	if err != nil {

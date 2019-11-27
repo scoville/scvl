@@ -211,7 +211,7 @@ func (e *Engine) UpdatePage(req *UpdatePageRequest) (page *domain.Page, err erro
 }
 
 func (e *Engine) fetchTitle(userID int, url string) (title string, err error) {
-	user, err := e.sqlClient.FindUser(&domain.User{ID: uint(userID)})
+	user, err := e.sqlClient.FindUser(domain.User{ID: uint(userID)})
 	if err != nil {
 		return
 	}

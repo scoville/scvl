@@ -27,7 +27,7 @@ type InviteRequest struct {
 
 // InviteUser deals new user which is invited by existing user
 func (e *Engine) InviteUser(req *InviteRequest) (*domain.UserInvitation, error) {
-	if _, err := e.sqlClient.FindUser(&domain.User{ID: req.FromUserID}); err != nil {
+	if _, err := e.sqlClient.FindUser(domain.User{ID: req.FromUserID}); err != nil {
 		return nil, err
 	}
 	invitation := &domain.UserInvitation{

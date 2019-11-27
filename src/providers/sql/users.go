@@ -7,7 +7,7 @@ import (
 
 const tblUsers = "users"
 
-func (c *client) FindUser(cond *domain.User) (user *domain.User, err error) {
+func (c *client) FindUser(cond domain.User) (user *domain.User, err error) {
 	user = &domain.User{}
 
 	err = c.db.Table(tblUsers).
