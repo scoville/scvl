@@ -2,7 +2,6 @@ package web
 
 import (
 	"net/http"
-	"os"
 
 	"github.com/gorilla/context"
 	"github.com/scoville/scvl/src/domain"
@@ -23,9 +22,9 @@ func (web *Web) invitationCreateHandler(w http.ResponseWriter, r *http.Request) 
 		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
 		return
 	}
-	url := "https://" + os.Getenv("MAIN_DOMAIN") + "/register/" + invitation.Hash
+	registerPath := "/register/" + invitation.Hash
 	resp := map[string]interface{}{
-		"InvitationURL": url,
+		"RegisterPath": registerPath,
 	}
 	renderTemplate(w, r, "/invitation.tpl", resp)
 }

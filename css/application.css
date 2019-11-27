@@ -24,6 +24,13 @@ body {
   height: 100%;
 }
 
+div.login p {
+  margin: 15px auto;
+}
+div.login a.login.btn {
+  margin: 0;
+}
+
 .form-inline input[type="url"] {
   width: 480px;
   max-width: 100%;

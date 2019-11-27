@@ -14,7 +14,7 @@ func (web *Web) authenticate(h http.HandlerFunc) http.HandlerFunc {
 		userID, ok := session.Values["user_id"].(uint)
 		if ok {
 			user, err := web.engine.FindUser(userID)
-			if err != nil || (user.GoogleToken == "" && user.Status != domain.UserStatusValid) {
+			if err != nil || user.Status != domain.UserStatusValid {
 				log.Println("Failed to find user: " + err.Error())
 				ok = false
 			} else {
