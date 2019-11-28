@@ -35,7 +35,7 @@ func (c *client) FindOrCreateUser(params domain.User) (user *domain.User, err er
 		Assign(domain.User{
 			Name:        params.Name,
 			GoogleToken: params.GoogleToken,
-			Status:      domain.UserStatusValid}).
+			Status:      params.Status}).
 		FirstOrCreate(user).Error
 	return
 }

@@ -8,9 +8,10 @@ type SQLClient interface {
 
 	FindUser(domain.User) (*domain.User, error)
 	FindOrCreateUser(domain.User) (*domain.User, error)
-	CreateInvitation(*domain.UserInvitation) (*domain.UserInvitation, error)
-	FindInvitation(string) (*domain.UserInvitation, error)
-	UpdateInvitation(*domain.UserInvitation, *domain.UserInvitation) (*domain.UserInvitation, error)
+
+	CreateInvitation(*domain.UserInvitation) error
+	FindInvitation(domain.UserInvitation) (*domain.UserInvitation, error)
+	UpdateInvitation(*domain.UserInvitation, *domain.UserInvitation) error
 	UserRegister(*domain.User, *domain.User) (*domain.User, error)
 
 	FindPages(params *FindPagesRequest) (pages []*domain.Page, count int, err error)

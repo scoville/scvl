@@ -9,6 +9,6 @@
     </div>
   </form>
   <p>または、</p>
-  <a href="{{.LoginURL}}" class="login btn btn-primary btn-lg">＠Sc0villeでログイン</a>
+  <a href="{{.LoginURL}}" class="login btn btn-primary btn-lg">Googleアカウントでログイン</a>
 </div>
 {{end}}

@@ -11,7 +11,7 @@ type FindInvitationRequest struct {
 
 // FindInvitation find the user invitation by hash
 func (e *Engine) FindInvitation(req *FindInvitationRequest) (*domain.UserInvitation, error) {
-	invitation, err := e.sqlClient.FindInvitation(req.Hash)
+	invitation, err := e.sqlClient.FindInvitation(domain.UserInvitation{Hash: req.Hash})
 	if err != nil {
 		return nil, err
 	}
@@ -30,12 +30,32 @@ func (e *Engine) InviteUser(req *InviteRequest) (*domain.UserInvitation, error) 
 	if _, err := e.sqlClient.FindUser(domain.User{ID: req.FromUserID}); err != nil {
 		return nil, err
 	}
+	user, err := e.sqlClient.FindUser(domain.User{
+		Email:  req.Email,
+		Status: domain.UserStatusTemp,
+	})
+	if err == nil && user != nil {
+		invitation, err := e.sqlClient.FindInvitation(domain.UserInvitation{
+			FromUserID: req.FromUserID,
+			ToUserID:   user.ID,
+			Status:     domain.InvitationStatusSent,
+		})
+		if err != nil {
+			return nil, err
+		}
+		params := &domain.UserInvitation{Hash: domain.GenerateSlug(64)}
+		err = e.sqlClient.UpdateInvitation(invitation, params)
+		return invitation, err
+	}
+
 	invitation := &domain.UserInvitation{
+		Status:     domain.InvitationStatusSent,
 		FromUserID: req.FromUserID,
 		ToUser: &domain.User{
 			Status: domain.UserStatusTemp,
 			Email:  req.Email,
 		},
 	}
-	return e.sqlClient.CreateInvitation(invitation)
+	err = e.sqlClient.CreateInvitation(invitation)
+	return invitation, err
 }

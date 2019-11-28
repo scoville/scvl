@@ -22,6 +22,7 @@ func (e *Engine) FindOrCreateUserByGoogleCode(code string) (*domain.User, error)
 	if e.allowedDomain != "" && !strings.HasSuffix(u.Email, "@"+e.allowedDomain) {
 		return nil, fmt.Errorf("only %s can allowed to use this service", e.allowedDomain)
 	}
+	u.Status = domain.UserStatusValid
 	return e.sqlClient.FindOrCreateUser(u)
 }
 
@@ -33,7 +34,7 @@ type RegistrationRequest struct {
 
 // UserRegister creates the user who is invited to the system.
 func (e *Engine) UserRegister(req *RegistrationRequest) (*domain.User, error) {
-	invitation, err := e.sqlClient.FindInvitation(req.Hash)
+	invitation, err := e.sqlClient.FindInvitation(domain.UserInvitation{Hash: req.Hash})
 	if err != nil {
 		return nil, err
 	}
@@ -51,11 +52,11 @@ func (e *Engine) UserRegister(req *RegistrationRequest) (*domain.User, error) {
 		return nil, err
 	}
 	user.Status = domain.UserStatusValid
-	usedInvitation, err := e.sqlClient.UpdateInvitation(invitation, &domain.UserInvitation{
+	err = e.sqlClient.UpdateInvitation(invitation, &domain.UserInvitation{
 		Status: domain.InvitationStatusUsed,
 		ToUser: user,
 	})
-	return usedInvitation.ToUser, err
+	return invitation.ToUser, err
 }
 
 // LoginUserRequest is the Reqeust

@@ -7,21 +7,22 @@ import (
 
 const tblUserInvitations = "user_invitations"
 
-func (c *client) FindInvitation(hash string) (*domain.UserInvitation, error) {
+func (c *client) FindInvitation(cond domain.UserInvitation) (*domain.UserInvitation, error) {
 	invitation := &domain.UserInvitation{}
 	err := c.db.Table(tblUserInvitations).
 		Preload("ToUser", func(db *gorm.DB) *gorm.DB {
 			return db
-		}).First(invitation, "hash = ?", hash).Error
+		}).First(invitation, cond).Error
 	return invitation, err
 }
 
-func (c *client) UpdateInvitation(invitation, params *domain.UserInvitation) (*domain.UserInvitation, error) {
-	err := c.db.Model(invitation).Updates(params).Error
-	return invitation, err
+func (c *client) UpdateInvitation(invitation, params *domain.UserInvitation) (err error) {
+	err = c.db.Table(tblUserInvitations).
+		Model(invitation).Updates(params).Error
+	return err
 }
 
-func (c *client) CreateInvitation(params *domain.UserInvitation) (*domain.UserInvitation, error) {
-	err := c.db.Create(params).Error
-	return params, err
+func (c *client) CreateInvitation(params *domain.UserInvitation) (err error) {
+	err = c.db.Create(params).Error
+	return
 }
