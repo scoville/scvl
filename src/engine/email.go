@@ -46,7 +46,7 @@ func (e *Engine) SendEmail(req *CreateEmailRequest) (err error) {
 		if err != nil {
 			return
 		}
-		time.Sleep(3)
+		time.Sleep(3 * time.Second)
 	}
 	return
 }
