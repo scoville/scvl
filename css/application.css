@@ -24,6 +24,10 @@ body {
   height: 100%;
 }
 
+div.register {
+  flex-direction: column;
+  align-items: inherit;
+}
 div.login p {
   margin: 15px auto;
 }

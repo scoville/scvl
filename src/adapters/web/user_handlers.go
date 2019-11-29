@@ -10,6 +10,7 @@ import (
 func (web *Web) userRegistrationHandler(w http.ResponseWriter, r *http.Request) {
 	user, err := web.engine.UserRegister(&engine.RegistrationRequest{
 		Hash:     r.FormValue("hash"),
+		Name:     r.FormValue("name"),
 		Password: r.FormValue("password"),
 	})
 	if err != nil {

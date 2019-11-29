@@ -28,6 +28,7 @@ func (e *Engine) FindOrCreateUserByGoogleCode(code string) (*domain.User, error)
 
 // RegistrationRequest is the request
 type RegistrationRequest struct {
+	Name     string
 	Hash     string
 	Password string
 }
@@ -51,6 +52,7 @@ func (e *Engine) UserRegister(req *RegistrationRequest) (*domain.User, error) {
 	if err := user.SetPassword(req.Password); err != nil {
 		return nil, err
 	}
+	user.Name = req.Name
 	user.Status = domain.UserStatusValid
 	err = e.sqlClient.UpdateInvitation(invitation, &domain.UserInvitation{
 		Status: domain.InvitationStatusUsed,
