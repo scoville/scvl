@@ -14,9 +14,9 @@
     </tr>
     {{range .EmailTemplate.FilterEmailNum(3)}}
       <tr>
-        <td>.To</td>
-        <td>.Title</td>
-        <td>.Body</td>
+        <td>{{.To}}</td>
+        <td>{{.Title}}</td>
+        <td>{{.Body}}</td>
       </tr>
     {{end}}
   </table>
