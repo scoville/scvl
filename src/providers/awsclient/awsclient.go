@@ -107,7 +107,7 @@ func (c *awsClient) DownloadFromS3(path string) (data []byte, err error) {
 	return
 }
 
-func (c *awsClient) SendFileMail(file *domain.File, password string) error {
+func (c *awsClient) SendFileEmail(file *domain.File, password string) (err error) {
 	if file.Email == nil {
 		return errors.New("Email is empty")
 	}
@@ -125,7 +125,7 @@ func (c *awsClient) SendFileMail(file *domain.File, password string) error {
 	}
 	body, err := file.Email.HTML(c.fileDomain, file)
 	if err != nil {
-		return err
+		return
 	}
 
 	svc := ses.New(c.svc, aws.NewConfig().WithRegion(c.sesRegion))
@@ -149,14 +149,14 @@ func (c *awsClient) SendFileMail(file *domain.File, password string) error {
 		Source: aws.String(c.mailFrom.String()),
 	})
 	if err != nil {
-		return err
+		return
 	}
 	if password == "" {
 		return nil
 	}
 	passBody, err := file.Email.PasswordHTML(file, password)
 	if err != nil {
-		return err
+		return
 	}
 	_, err = svc.SendEmail(&ses.SendEmailInput{
 		Destination: &ses.Destination{
@@ -180,22 +180,17 @@ func (c *awsClient) SendFileMail(file *domain.File, password string) error {
 	return err
 }
 
-func (c *awsClient) SendGroupEmails(emails []*domain.Email, sender string) (err error) {
+func (c *awsClient) SendEmail(email *domain.Email, sender string) (err error) {
 	svc := ses.New(c.svc, aws.NewConfig().WithRegion(c.sesRegion))
-	errChan := make(chan error)
-	for _, email := range emails {
-		go sendEmail(svc, email, sender, errChan)
-		select {
-		case err = <-errChan:
-			return
-		}
+	if err = sendEmail(svc, email, sender); err != nil {
+		return
 	}
 	return
 }
 
 // Todo: SendFileNameでも使えるようにする
-func sendEmail(svc *ses.SES, email *domain.Email, sender string, errChan chan error) {
-	_, err := svc.SendEmail(&ses.SendEmailInput{
+func sendEmail(svc *ses.SES, email *domain.Email, sender string) (err error) {
+	_, err = svc.SendEmail(&ses.SendEmailInput{
 		Destination: &ses.Destination{
 			ToAddresses:  []*string{&email.To},
 			BccAddresses: []*string{&sender},
@@ -213,6 +208,5 @@ func sendEmail(svc *ses.SES, email *domain.Email, sender string, errChan chan er
 			},
 		},
 	})
-	errChan <- err
 	return
 }

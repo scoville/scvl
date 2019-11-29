@@ -2,8 +2,10 @@ package engine
 
 import (
 	"errors"
-	"strconv"
+	"fmt"
+	"os"
 	"strings"
+	"time"
 
 	"github.com/scoville/scvl/src/domain"
 )
@@ -19,39 +21,32 @@ type CreateEmailRequest struct {
 	User           *domain.User
 }
 
-// SendEmailRequest is the request for sending an email
-type SendEmailRequest struct {
-	ToAddresses  []*string
-	BccAddresses []*string
-	Body         string
-}
-
 // CreateEmail creates an email
 func (e *Engine) CreateEmail(req *CreateEmailRequest) (emailTemplate *domain.EmailTemplate, err error) {
 
-	emailTemplate, err = createEmailTemplate(e, req)
+	emailTemplate, err = e.createEmailTemplate(req)
 	return
 }
 
 // SendEmail send a email
 func (e *Engine) SendEmail(req *CreateEmailRequest) (err error) {
-	emailTemplate, err := createEmailTemplate(e, req)
-	if err != nil {
-		return
-	}
 	// base64でエンコード済みの透過gifを本文に追加
-	emailID := strconv.Itoa(int(emailTemplate.ID))
-	openConfirmationCode := "<img src=\"https://scvl.site/emails/read/?id=" + emailID + "\">"
-	req.Template = req.Template + openConfirmationCode
-	err = e.awsClient.SendGroupEmails(emailTemplate.BatchEmail.Emails, emailTemplate.BatchEmail.Sender)
+	emailTemplate, err := e.createEmailTemplate(req)
 	if err != nil {
 		return
 	}
 	for _, email := range emailTemplate.BatchEmail.Emails {
+		openConfirmationCode := fmt.Sprintf(`<img src="https://%s/%d/read">`, os.Getenv("EMAIL_DOMAIN"), email.ID)
+		email.Body = email.Body + openConfirmationCode
+		err = e.awsClient.SendEmail(email, emailTemplate.BatchEmail.Sender)
+		if err != nil {
+			return
+		}
 		err = e.sqlClient.CreateEmail(email)
 		if err != nil {
 			return
 		}
+		time.Sleep(3)
 	}
 	return
 }
@@ -62,7 +57,7 @@ func (e *Engine) ReadEmail(emailID string) (err error) {
 	return
 }
 
-func createEmailTemplate(e *Engine, req *CreateEmailRequest) (emailTemplate *domain.EmailTemplate, err error) {
+func (e *Engine) createEmailTemplate(req *CreateEmailRequest) (emailTemplate *domain.EmailTemplate, err error) {
 	splitted := strings.Split(req.SpreadsheetURL, "/")
 	if len(splitted) < 6 {
 		err = errors.New("invalid spreadsheet url")

@@ -77,8 +77,8 @@ func (web *Web) emailSendHandler(w http.ResponseWriter, r *http.Request) {
 
 func (web *Web) emailReadHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	emailID := vars["email_id"]
-	err := web.engine.ReadEmail(emailID)
+	id := vars["id"]
+	err := web.engine.ReadEmail(id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

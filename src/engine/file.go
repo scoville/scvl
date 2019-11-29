@@ -95,7 +95,7 @@ func (e *Engine) UploadFile(req UploadFileRequest) (file *domain.File, err error
 	if req.SendPassword {
 		password = req.Password
 	}
-	err = e.awsClient.SendFileMail(file, password)
+	err = e.awsClient.SendFileEmail(file, password)
 	return
 }
 

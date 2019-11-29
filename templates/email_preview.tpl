@@ -8,13 +8,15 @@
 
   <table class="table">
     <tr>
-      <th>送信先</th>
+      <td>送信先</td>
+      <td>タイトル</td>
       <td>送信文言</td>
     </tr>
     {{range .EmailTemplate.FilterEmailNum(3)}}
       <tr>
-        <td></td>
-        <td></td>
+        <td>.To</td>
+        <td>.Title</td>
+        <td>.Body</td>
       </tr>
     {{end}}
   </table>

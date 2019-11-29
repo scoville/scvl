@@ -27,13 +27,12 @@ func NewEmail(template, to, title string, variables map[string]string) (email *E
 
 // Email is the struct
 type Email struct {
-	ID            uint `gorm:"primary_key"`
-	CreatedAt     time.Time
-	UpdatedAt     time.Time
-	BatchEmailID  int        `json:"batch_email_id" gorm:"index; not null"`
-	To            string     `json:"to"`
-	Title         string     `json:"title"`
-	Body          string     `json:"body"`
-	OpenedAt      *time.Time `json:"opened_at"`
-	LinkClickedAt *time.Time `json:"link_clicked_at"`
+	ID           uint `gorm:"primary_key"`
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
+	BatchEmailID int        `json:"batch_email_id" gorm:"index; not null"`
+	To           string     `json:"to"`
+	Title        string     `json:"title"`
+	Body         string     `json:"body"`
+	OpenedAt     *time.Time `json:"opened_at"`
 }
