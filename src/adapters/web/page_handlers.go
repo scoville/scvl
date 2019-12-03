@@ -23,17 +23,17 @@ func (web *Web) pagesHandler(w http.ResponseWriter, r *http.Request) {
 	if bytes != nil {
 		json.Unmarshal(bytes, &resp)
 	}
-	user, ok := context.Get(r, "user").(*domain.User)
-	if ok {
-		resp["User"] = user
-	}
 	var req engine.FindPagesRequest
 	err := form.NewDecoder().Decode(&req, r.URL.Query())
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	req.UserID = user.ID
+	user, ok := context.Get(r, "user").(*domain.User)
+	if ok {
+		resp["User"] = user
+		req.UserID = user.ID
+	}
 	pages, count, err := web.engine.FindPages(&req)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

@@ -24,6 +24,17 @@ body {
   height: 100%;
 }
 
+div.register {
+  flex-direction: column;
+  align-items: inherit;
+}
+div.login p {
+  margin: 15px auto;
+}
+div.login a.login.btn {
+  margin: 0;
+}
+
 .form-inline input[type="url"] {
   width: 480px;
   max-width: 100%;

@@ -5,11 +5,12 @@ import (
 	"strings"
 
 	"github.com/scoville/scvl/src/domain"
+	"golang.org/x/crypto/bcrypt"
 )
 
 // FindUser finds and returns the user
 func (e *Engine) FindUser(userID uint) (*domain.User, error) {
-	return e.sqlClient.FindUser(userID)
+	return e.sqlClient.FindUser(domain.User{ID: userID})
 }
 
 // FindOrCreateUserByGoogleCode finds or creates the user
@@ -21,5 +22,61 @@ func (e *Engine) FindOrCreateUserByGoogleCode(code string) (*domain.User, error)
 	if e.allowedDomain != "" && !strings.HasSuffix(u.Email, "@"+e.allowedDomain) {
 		return nil, fmt.Errorf("only %s can allowed to use this service", e.allowedDomain)
 	}
+	u.Status = domain.UserStatusValid
 	return e.sqlClient.FindOrCreateUser(u)
+}
+
+// RegistrationRequest is the request
+type RegistrationRequest struct {
+	Name     string
+	Hash     string
+	Password string
+}
+
+// UserRegister creates the user who is invited to the system.
+func (e *Engine) UserRegister(req *RegistrationRequest) (*domain.User, error) {
+	invitation, err := e.sqlClient.FindInvitation(domain.UserInvitation{Hash: req.Hash})
+	if err != nil {
+		return nil, err
+	}
+	if err := invitation.Valid(); err != nil {
+		return nil, err
+	}
+	user, err := e.sqlClient.FindUser(domain.User{
+		Email:  invitation.ToUser.Email,
+		Status: domain.UserStatusTemp,
+	})
+	if err != nil {
+		return nil, err
+	}
+	if err := user.SetPassword(req.Password); err != nil {
+		return nil, err
+	}
+	user.Name = req.Name
+	user.Status = domain.UserStatusValid
+	err = e.sqlClient.UpdateInvitation(invitation, &domain.UserInvitation{
+		Status: domain.InvitationStatusUsed,
+		ToUser: user,
+	})
+	return invitation.ToUser, err
+}
+
+// LoginUserRequest is the Reqeust
+type LoginUserRequest struct {
+	Email    string
+	Password string
+}
+
+// LoginUser is login request
+func (e *Engine) LoginUser(req *LoginUserRequest) (*domain.User, error) {
+	user, err := e.sqlClient.FindUser(domain.User{
+		Email: req.Email,
+	})
+	if err != nil {
+		return nil, err
+	}
+	if err := bcrypt.CompareHashAndPassword([]byte(user.EncryptedPassword), []byte(req.Password)); err != nil {
+		return nil, err
+	}
+	return user, nil
 }

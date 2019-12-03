@@ -7,7 +7,7 @@ import (
 
 const tblUsers = "users"
 
-func (c *client) FindUser(id uint) (user *domain.User, err error) {
+func (c *client) FindUser(cond domain.User) (user *domain.User, err error) {
 	user = &domain.User{}
 
 	err = c.db.Table(tblUsers).
@@ -17,7 +17,7 @@ func (c *client) FindUser(id uint) (user *domain.User, err error) {
 		Preload("Images", func(db *gorm.DB) *gorm.DB {
 			return db.Order("images.created_at DESC")
 		}).
-		First(user, id).Error
+		First(user, cond).Error
 	if err != nil {
 		return
 	}
@@ -32,7 +32,15 @@ func (c *client) FindOrCreateUser(params domain.User) (user *domain.User, err er
 	user = &domain.User{}
 	err = c.db.
 		Where(domain.User{Email: params.Email}).
-		Assign(domain.User{Name: params.Name, GoogleToken: params.GoogleToken}).
+		Assign(domain.User{
+			Name:        params.Name,
+			GoogleToken: params.GoogleToken,
+			Status:      params.Status}).
 		FirstOrCreate(user).Error
 	return
+}
+
+func (c *client) UserRegister(user, params *domain.User) (*domain.User, error) {
+	err := c.db.Model(user).Update(params).Error
+	return user, err
 }
