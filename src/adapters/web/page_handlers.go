@@ -69,6 +69,30 @@ func (web *Web) pagesHandler(w http.ResponseWriter, r *http.Request) {
 	renderTemplate(w, r, "/pages.tpl", resp)
 }
 
+func (web *Web) shortenByAPIHandler(w http.ResponseWriter, r *http.Request) {
+	var v engine.ShortenRequest
+	if err := json.NewDecoder(r.Body).Decode(&v); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	page, err := web.engine.Shorten(&v)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	bytes, _ := json.Marshal(map[string]string{
+		"URL":  page.URL,
+		"Slug": page.Slug,
+	})
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	w.Write(bytes)
+}
+
 func (web *Web) shortenHandler(w http.ResponseWriter, r *http.Request) {
 	user, ok := context.Get(r, "user").(*domain.User)
 	if !ok {
