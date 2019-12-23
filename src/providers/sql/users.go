@@ -36,3 +36,9 @@ func (c *client) FindOrCreateUser(params domain.User) (user *domain.User, err er
 		FirstOrCreate(user).Error
 	return
 }
+
+func (c *client) UpdateUser(user, params *domain.User) error {
+	return c.db.Table(tblUsers).
+		Model(user).
+		Update(params).Error
+}

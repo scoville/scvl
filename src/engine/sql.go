@@ -8,6 +8,7 @@ type SQLClient interface {
 
 	FindUser(uint) (*domain.User, error)
 	FindOrCreateUser(domain.User) (*domain.User, error)
+	UpdateUser(*domain.User, *domain.User) error
 
 	FindPages(params *FindPagesRequest) (pages []*domain.Page, count int, err error)
 	FindPageBySlug(string) (*domain.Page, error)

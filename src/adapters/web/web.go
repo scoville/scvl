@@ -37,6 +37,7 @@ func (web *Web) Start(port string) error {
 	r.Handle("/logout", web.authenticate(web.logoutHandler)).Methods(http.MethodPost)
 	r.Handle("/shorten", web.authenticate(web.shortenHandler)).Methods(http.MethodPost)
 	r.HandleFunc("/api/shorten", web.shortenByAPIHandler).Methods(http.MethodPost)
+	r.Handle("/api/publish", web.authenticate(web.publishAPIKeyHandler)).Methods(http.MethodPost)
 	r.Handle("/pages", web.authenticate(web.pagesHandler)).Methods(http.MethodGet)
 	r.Handle("/files", web.authenticate(web.filesHandler)).Methods(http.MethodGet)
 	r.Handle("/files", web.authenticate(web.fileUploadHandler)).Methods(http.MethodPost)
