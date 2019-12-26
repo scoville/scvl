@@ -61,7 +61,7 @@ func (e *Engine) Shorten(req *ShortenRequest) (page *domain.Page, err error) {
 
 	page = &domain.Page{
 		UserID: req.UserID,
-		Slug:   domain.GenerateSlug(5),
+		Slug:   domain.GenerateSlug(domain.PageSlugLength),
 		Title:  title,
 		URL:    req.URL,
 	}
@@ -81,8 +81,7 @@ func (e *Engine) Shorten(req *ShortenRequest) (page *domain.Page, err error) {
 		Image:       req.Image,
 		Title:       req.Title,
 	}
-	err = e.sqlClient.CreateOGP(page.OGP)
-	if err != nil {
+	if err = e.sqlClient.CreateOGP(page.OGP); err != nil {
 		return
 	}
 
@@ -106,20 +105,17 @@ func (e *Engine) ShortenByAPI(req *ShortenByAPIRequest) (page *domain.Page, err 
 		err = errors.New("api_key cannot be empty")
 		return
 	}
-	_, err = e.sqlClient.FindUserByAPIKey(req.APIKey)
-	if err != nil {
+	if _, err = e.sqlClient.FindUserByAPIKey(req.APIKey); err != nil {
 		return
 	}
 
 	page = &domain.Page{
-		Slug: domain.GenerateSlug(5),
+		Slug: domain.GenerateSlug(domain.PageSlugLength),
 		URL:  req.URL,
 	}
-	err = e.sqlClient.CreatePage(page)
-	if err != nil {
+	if err = e.sqlClient.CreatePage(page); err != nil {
 		return
 	}
-
 	e.redisClient.SetURL(page.Slug, page.URL)
 	return
 }

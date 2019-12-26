@@ -17,3 +17,6 @@ type Page struct {
 
 	OGP *OGP `json:"ogp"`
 }
+
+// PageSlugLength is the length for shorten url path.
+const PageSlugLength = 5
