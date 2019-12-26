@@ -90,6 +90,40 @@ func (e *Engine) Shorten(req *ShortenRequest) (page *domain.Page, err error) {
 	return
 }
 
+// ShortenByAPIRequest is the request struct for ShortenByAPI function
+type ShortenByAPIRequest struct {
+	URL    string
+	APIKey string
+}
+
+// ShortenByAPI shorten url
+func (e *Engine) ShortenByAPI(req *ShortenByAPIRequest) (page *domain.Page, err error) {
+	if req.URL == "" {
+		err = errors.New("url cannot be empty")
+		return
+	}
+	if req.APIKey == "" {
+		err = errors.New("api_key cannot be empty")
+		return
+	}
+	_, err = e.sqlClient.FindUserByAPIKey(req.APIKey)
+	if err != nil {
+		return
+	}
+
+	page = &domain.Page{
+		Slug: domain.GenerateSlug(5),
+		URL:  req.URL,
+	}
+	err = e.sqlClient.CreatePage(page)
+	if err != nil {
+		return
+	}
+
+	e.redisClient.SetURL(page.Slug, page.URL)
+	return
+}
+
 // AccessRequest is the request struct for Access function
 type AccessRequest struct {
 	Slug      string

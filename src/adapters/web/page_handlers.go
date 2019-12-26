@@ -70,17 +70,17 @@ func (web *Web) pagesHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (web *Web) shortenByAPIHandler(w http.ResponseWriter, r *http.Request) {
-	var v engine.ShortenRequest
+	var v engine.ShortenByAPIRequest
 	if err := json.NewDecoder(r.Body).Decode(&v); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	page, err := web.engine.Shorten(&v)
+	page, err := web.engine.ShortenByAPI(&v)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	bytes, _ := json.Marshal(map[string]string{
+	bytes, err := json.Marshal(map[string]string{
 		"URL":  page.URL,
 		"Slug": page.Slug,
 	})

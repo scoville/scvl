@@ -28,6 +28,16 @@ func (c *client) FindUser(id uint) (user *domain.User, err error) {
 	return
 }
 
+func (c *client) FindUserByAPIKey(apiKey string) (user *domain.User, err error) {
+	user = &domain.User{}
+
+	err = c.db.Table(tblUsers).
+		Where("api_key = ?", apiKey).
+		First(user).Error
+
+	return
+}
+
 func (c *client) FindOrCreateUser(params domain.User) (user *domain.User, err error) {
 	user = &domain.User{}
 	err = c.db.
