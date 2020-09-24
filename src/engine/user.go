@@ -18,7 +18,14 @@ func (e *Engine) FindOrCreateUserByGoogleCode(code string) (*domain.User, error)
 	if err != nil {
 		return nil, err
 	}
-	if e.allowedDomain != "" && !strings.HasSuffix(u.Email, "@"+e.allowedDomain) {
+	permitted := (e.allowedDomain == "")
+	for _, allowedDomain := range strings.Split(e.allowedDomain, ",") {
+		if strings.HasSuffix(u.Email, "@"+allowedDomain) {
+			permitted = true
+			break
+		}
+	}
+	if !permitted {
 		return nil, fmt.Errorf("only %s can allowed to use this service", e.allowedDomain)
 	}
 	return e.sqlClient.FindOrCreateUser(u)
