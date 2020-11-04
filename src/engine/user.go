@@ -18,14 +18,14 @@ func (e *Engine) FindOrCreateUserByGoogleCode(code string) (*domain.User, error)
 	if err != nil {
 		return nil, err
 	}
-	var ok bool
+	permitted := (e.allowedDomains == "")
 	for _, allowedDomain := range strings.Split(e.allowedDomains, ",") {
 		if strings.HasSuffix(u.Email, "@"+allowedDomain) {
-			ok = true
+			permitted = true
 			break
 		}
 	}
-	if !ok {
+	if !permitted {
 		return nil, fmt.Errorf("this email address is not allowed to use this service")
 	}
 
