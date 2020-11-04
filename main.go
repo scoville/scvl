@@ -66,7 +66,7 @@ func main() {
 		awsClient,
 		googleClient,
 		engine.Options{
-			AllowedDomain: os.Getenv("ALLOWED_DOMAIN"),
+			AllowedDomains: os.Getenv("ALLOWED_DOMAINS"),
 		},
 	)
 

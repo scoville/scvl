@@ -1,0 +1,60 @@
+{{define "body"}}
+<div class="jumbotron">
+  <h1>SCVL Email Batch Sender</h1>
+  {{if .LoginURL}}
+    <a href="{{.LoginURL}}" class="login btn btn-primary btn-lg">ログイン</a>
+  {{else}}
+    <p>メールの一括送信ができます</p>
+    <form action="{{if .IsEmailDomain}}/{{else}}/emails{{end}}" method="post">
+      <input type="hidden" name="preview" value="1" />
+      <div class="form-group">
+        <label for="spreadsheet_url">Spreadsheet URL</label>
+        <input type="url" name="spreadsheet_url" value="" class="form-control" required />
+      </div>
+      <div class="form-group">
+        <label for="sheet_name">シート名</label>
+        <input type="text" name="sheet_name" value="シート1" class="form-control" required />
+      </div>
+      <div class="form-group">
+        <label for="sender">送信元</label>
+        <input type="text" name="sender" value="{{.User.Name}} <{{.User.Email}}>" class="form-control" required />
+      </div>
+      <div class="form-group">
+        <label for="title">タイトル</label>
+        <input type="text" name="title" value="タイトル" class="form-control" required />
+      </div>
+      <div class="form-group">
+        <label for="template">テンプレート</label>
+        <textarea name="template"class="form-control" required>
+[[name]] 様
+
+こちらはテストメールになります。
+
+よろしくお願いいたします。
+        </textarea>
+      </div>
+      </div>
+      <div class="mt20">
+        <input type="submit" value="プレビュー" class="btn btn-primary">
+      </div>
+    </form>
+  {{end}}
+</div>
+
+{{if .User}}
+  <h2>{{.User.Name}}による送信履歴</h2>
+  <table class="table emails">
+    <tr>
+      <th width="80">スプレッドシートのURL</th>
+      <th width="140">開封数 / 送信数</th>
+    </tr>
+    {{range .User.Emails}}
+      <tr>
+        <td class="truncate">{{.SpreadsheetURL}}</td>
+        <td class="truncate"></td>
+        <td>{{.OpenCount}} / {{.SentCount}}</td>
+      </tr>
+    {{end}}
+  </table>
+{{end}}
+{{end}}

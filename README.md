@@ -18,7 +18,7 @@ GOOGLE_CLIENT_ID=hogehoge.apps.googleusercontent.com
 GOOGLE_CLIENT_SECRET=SUPER_SECRET
 GOOGLE_REDIRECT_URL="http://127.0.0.1:8080/oauth/google/callback"
 DB_URL="root:@/scvl_development?charset=utf8&parseTime=True&loc=Local"
-ALLOWED_DOMAIN="sc0ville.com"
+ALLOWED_DOMAINS="sc0ville.com,en-courage.com,en-courage.net"
 ```
 
-Website: [scvl.site](http://scvl.site)
+Website: [scvl.site](https://scvl.site)

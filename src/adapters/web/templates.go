@@ -2,7 +2,6 @@ package web
 
 import (
 	"html/template"
-	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -25,13 +24,14 @@ func renderTemplate(w http.ResponseWriter, r *http.Request, path string, data ma
 		data["User"] = user
 		data["UserSignedIn"] = true
 	}
-	log.Println(r.Host)
 	data["IsMainHost"] = (r.Host == os.Getenv("MAIN_DOMAIN"))
 	data["IsFileHost"] = (r.Host == os.Getenv("FILE_DOMAIN"))
 	data["IsImageHost"] = (r.Host == os.Getenv("IMAGE_DOMAIN"))
+	data["IsEmailHost"] = (r.Host == os.Getenv("EMAIL_DOMAIN"))
 	data["MainHost"] = scheme + os.Getenv("MAIN_DOMAIN")
 	data["FileHost"] = scheme + os.Getenv("FILE_DOMAIN")
 	data["ImageHost"] = scheme + os.Getenv("IMAGE_DOMAIN")
+	data["EmailHost"] = scheme + os.Getenv("EMAIL_DOMAIN")
 	tpl := findTemplate("/layouts.tpl", path)
 	tpl.ExecuteTemplate(w, "base", data)
 }
