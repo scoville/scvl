@@ -15,7 +15,7 @@ import (
 	"image/jpeg"
 	"image/png"
 
-  "os"
+	"os"
 )
 
 // UploadImageRequest is the request struct for the UploadImage function

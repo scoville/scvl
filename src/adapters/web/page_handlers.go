@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-  "os"
+	"os"
 	"strconv"
 	"strings"
 
@@ -27,8 +27,6 @@ func (web *Web) pagesHandler(w http.ResponseWriter, r *http.Request) {
 	user, ok := context.Get(r, "user").(*domain.User)
 	if ok {
 		resp["User"] = user
-	}
-	if user != nil {
 		var req engine.FindPagesRequest
 		err := form.NewDecoder().Decode(&req, r.URL.Query())
 		if err != nil {
@@ -64,7 +62,10 @@ func (web *Web) pagesHandler(w http.ResponseWriter, r *http.Request) {
 			nextOffset := req.Offset + req.Limit
 			resp["NextURL"] = fmt.Sprintf("/pages?offset=%d&limit=%d", nextOffset, req.Limit)
 		}
+	} else {
+		resp["Pages"] = make([]*domain.Page, 0)
 	}
+
 	loginURL, ok := context.Get(r, "login_url").(string)
 	if ok {
 		resp["LoginURL"] = loginURL

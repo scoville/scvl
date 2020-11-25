@@ -21,7 +21,7 @@ type File struct {
 
 	Downloads     []FileDownload `json:"file_downloads"`
 	DownloadCount uint           `json:"download_count" gorm:"-"`
-	Email         *Email         `json:"email"`
+	Email         *FileEmail     `json:"email"`
 }
 
 // Name returns the name of the file

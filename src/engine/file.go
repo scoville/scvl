@@ -78,7 +78,7 @@ func (e *Engine) UploadFile(req UploadFileRequest) (file *domain.File, err error
 	if !req.SendEmail {
 		return
 	}
-	file.Email = &domain.Email{
+	file.Email = &domain.FileEmail{
 		FileID:          int(file.ID),
 		SenderName:      req.SenderName,
 		ReceiverName:    req.ReceiverName,
@@ -86,7 +86,7 @@ func (e *Engine) UploadFile(req UploadFileRequest) (file *domain.File, err error
 		BCCAddress:      req.BCCAddress,
 		Message:         req.Message,
 	}
-	err = e.sqlClient.CreateEmail(file.Email)
+	err = e.sqlClient.CreateFileEmail(file.Email)
 	if err != nil {
 		return
 	}
@@ -95,7 +95,7 @@ func (e *Engine) UploadFile(req UploadFileRequest) (file *domain.File, err error
 	if req.SendPassword {
 		password = req.Password
 	}
-	err = e.awsClient.SendMail(file, password)
+	err = e.awsClient.SendFileEmail(file, password)
 	return
 }
 
