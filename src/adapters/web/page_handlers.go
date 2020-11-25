@@ -126,7 +126,7 @@ func (web *Web) redirectHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (web *Web) qrHandler(w http.ResponseWriter, r *http.Request) {
-	png, err := qrcode.Encode("https://"+os.Getenv("MAIN_DOMAIN")+strings.Split(r.RequestURI, "/qr.png")[0], qrcode.Medium, 256)
+  png, err := qrcode.Encode("https://"+os.Getenv("MAIN_DOMAIN")+strings.Split(r.RequestURI, "/qr.png")[0], qrcode.Medium, 256)
 	if err != nil {
 		log.Println("Failed to generate QR code: ", err)
 		http.Error(w, "Failed to generate QR code", http.StatusInternalServerError)

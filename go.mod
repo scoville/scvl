@@ -4,7 +4,6 @@ go 1.12
 
 require (
 	github.com/Iwark/spreadsheet v0.0.0-20190731183439-815c2aaa68d2
-	github.com/Songmu/make2help v0.2.0 // indirect
 	github.com/aws/aws-sdk-go v1.19.6
 	github.com/denisenkom/go-mssqldb v0.0.0-20190515213511-eb9f6a1743f3 // indirect
 	github.com/erikstmartin/go-testdb v0.0.0-20160219214506-8d10e4a1bae5 // indirect
@@ -20,13 +19,11 @@ require (
 	github.com/jinzhu/now v1.0.0 // indirect
 	github.com/joho/godotenv v1.3.0
 	github.com/lib/pq v1.0.0 // indirect
-	github.com/markbates/refresh v1.11.1 // indirect
 	github.com/mattn/go-sqlite3 v1.10.0 // indirect
 	github.com/mssola/user_agent v0.5.0
 	github.com/skip2/go-qrcode v0.0.0-20190110000554-dc11ecdae0a9
 	github.com/tomasen/realip v0.0.0-20180522021738-f0c99a92ddce
-	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
+	golang.org/x/crypto v0.0.0-20190325154230-a5d413f7728c
 	golang.org/x/oauth2 v0.0.0-20190319182350-c85d3e98c914
-	golang.org/x/tools v0.0.0-20201124202034-299f270db459 // indirect
 	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
 )
