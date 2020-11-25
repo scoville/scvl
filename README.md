@@ -1,16 +1,15 @@
-scvl
-===
+# scvl
 
 scvl is a simple URL shortener written in go.
 
 ## Required
 
-* Redis
-* MySQL
+- Redis
+- MySQL
 
 ## Setup
 
-Place ``.env`` to root directory like below:
+Place `.env` to root directory like below:
 
 ```
 SESSION_SECRET=SUPER_SECRET_TOKEN
@@ -21,4 +20,4 @@ DB_URL="root:@/scvl_development?charset=utf8&parseTime=True&loc=Local"
 ALLOWED_DOMAINS="sc0ville.com,en-courage.com,en-courage.net"
 ```
 
-Website: [scvl.site](https://scvl.site)
+Website: [scvl.jp](https://scvl.jp)

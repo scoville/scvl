@@ -51,7 +51,7 @@ func (e *Engine) UploadImage(req UploadImageRequest) (dimg *domain.Image, err er
 	}
 	imgBase64Str := prefix + base64.StdEncoding.EncodeToString(buf.Bytes())
 
-	resp, err := http.Post("https://images.scvl.site", "application/json", bytes.NewReader([]byte(`{"image": "`+imgBase64Str+`"}`)))
+	resp, err := http.Post("https://images.scvl.jp", "application/json", bytes.NewReader([]byte(`{"image": "`+imgBase64Str+`"}`)))
 	if err != nil {
 		return
 	}
