@@ -4,6 +4,15 @@
   {{if .LoginURL}}
     <a href="{{.LoginURL}}" class="login btn btn-primary btn-lg">ログイン</a>
   {{else}}
+    <button class="btn btn-outline-info btn-xs api-key-show">API Keyを表示</button>
+    <div class="api-key-container" style="display:none">
+      <div class="api-key">
+        {{.User.APIKey}}
+      </div>
+      <form action="/api/key" method="post" class="form-inline mt-2 mt-md-0" id="publish-api-key-form">
+        <button class="btn btn-outline-info my-2 my-sm-0　api-key-publish" type="submit">API Keyを再発行</button>
+      </form>
+    </div>
     <p>URLの短縮ができます。</p>
     <form action="/shorten" method="post">
       <div class="form-inline">

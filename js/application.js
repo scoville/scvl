@@ -134,4 +134,12 @@ $(function(){
             }
         })
     }
+
+    $('.api-key-show').click(function(){
+        $('.api-key-show').hide();
+        $('.api-key-container').toggle();
+    })
+    $('#publish-api-key-form').submit(function(){
+        return confirm('再発行するとこれまで使用していたAPI Keyは使用できなくなります。\nAPI Keyを再発行しますか？');
+    })
 })

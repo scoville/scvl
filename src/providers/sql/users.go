@@ -28,6 +28,16 @@ func (c *client) FindUser(id uint) (user *domain.User, err error) {
 	return
 }
 
+func (c *client) FindUserByAPIKey(apiKey string) (user *domain.User, err error) {
+	user = &domain.User{}
+
+	err = c.db.Table(tblUsers).
+		Where("api_key = ?", apiKey).
+		First(user).Error
+
+	return
+}
+
 func (c *client) FindOrCreateUser(params domain.User) (user *domain.User, err error) {
 	user = &domain.User{}
 	err = c.db.
@@ -35,4 +45,10 @@ func (c *client) FindOrCreateUser(params domain.User) (user *domain.User, err er
 		Assign(domain.User{Name: params.Name, GoogleToken: params.GoogleToken}).
 		FirstOrCreate(user).Error
 	return
+}
+
+func (c *client) UpdateUser(user, params *domain.User) error {
+	return c.db.Table(tblUsers).
+		Model(user).
+		Update(params).Error
 }

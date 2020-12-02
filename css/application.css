@@ -105,3 +105,18 @@ input[type="checkbox"] {
 textarea {
   min-height: 140px;
 }
+
+
+.api-key-container {
+  align-items: center;
+  display: flex;
+}
+
+.api-key {
+  width: 400px;
+  height: 30px;
+  line-height: 30px;
+  background: #fff;
+  text-align: center;
+  margin-right: 8px;
+}

@@ -7,7 +7,9 @@ type SQLClient interface {
 	Close() error
 
 	FindUser(uint) (*domain.User, error)
+	FindUserByAPIKey(string) (*domain.User, error)
 	FindOrCreateUser(domain.User) (*domain.User, error)
+	UpdateUser(*domain.User, *domain.User) error
 
 	FindPages(params *FindPagesRequest) (pages []*domain.Page, count int, err error)
 	FindPageBySlug(string) (*domain.Page, error)

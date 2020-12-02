@@ -61,7 +61,7 @@ func (e *Engine) Shorten(req *ShortenRequest) (page *domain.Page, err error) {
 
 	page = &domain.Page{
 		UserID: req.UserID,
-		Slug:   domain.GenerateSlug(5),
+		Slug:   domain.GenerateSlug(domain.PageSlugLength),
 		Title:  title,
 		URL:    req.URL,
 	}
@@ -81,12 +81,42 @@ func (e *Engine) Shorten(req *ShortenRequest) (page *domain.Page, err error) {
 		Image:       req.Image,
 		Title:       req.Title,
 	}
-	err = e.sqlClient.CreateOGP(page.OGP)
-	if err != nil {
+	if err = e.sqlClient.CreateOGP(page.OGP); err != nil {
 		return
 	}
 
 	e.redisClient.SetOGPID(page.Slug, int(page.OGP.ID))
+	return
+}
+
+// ShortenByAPIRequest is the request struct for ShortenByAPI function
+type ShortenByAPIRequest struct {
+	URL    string
+	APIKey string
+}
+
+// ShortenByAPI shorten url
+func (e *Engine) ShortenByAPI(req *ShortenByAPIRequest) (page *domain.Page, err error) {
+	if req.URL == "" {
+		err = errors.New("url cannot be empty")
+		return
+	}
+	if req.APIKey == "" {
+		err = errors.New("api_key cannot be empty")
+		return
+	}
+	if _, err = e.sqlClient.FindUserByAPIKey(req.APIKey); err != nil {
+		return
+	}
+
+	page = &domain.Page{
+		Slug: domain.GenerateSlug(domain.PageSlugLength),
+		URL:  req.URL,
+	}
+	if err = e.sqlClient.CreatePage(page); err != nil {
+		return
+	}
+	e.redisClient.SetURL(page.Slug, page.URL)
 	return
 }
 

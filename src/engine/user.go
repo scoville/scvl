@@ -31,3 +31,13 @@ func (e *Engine) FindOrCreateUserByGoogleCode(code string) (*domain.User, error)
 
 	return e.sqlClient.FindOrCreateUser(u)
 }
+
+// UpdateUserAPIKey updates the user
+func (e *Engine) UpdateUserAPIKey(userID uint) error {
+	u, err := e.sqlClient.FindUser(userID)
+	if err != nil {
+		return err
+	}
+	key := domain.GenerateSlug(40)
+	return e.sqlClient.UpdateUser(u, &domain.User{APIKey: key})
+}
