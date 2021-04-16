@@ -81,19 +81,19 @@ func (c *awsClient) UploadToS3(file io.ReadSeeker, path string) error {
 func (c *awsClient) DownloadFromS3(path string) (data []byte, err error) {
 
 	// First try to find compressed version
-	resp, err := s3.New(c.svc, aws.NewConfig().WithRegion(c.s3Region)).
-		GetObject(&s3.GetObjectInput{
-			Bucket: aws.String(c.s3Bucket),
-			Key:    aws.String("compressed/" + path),
-		})
-	if err == nil {
-		buf := new(bytes.Buffer)
-		buf.ReadFrom(resp.Body)
-		data = buf.Bytes()
-		return
-	}
+	//resp, err := s3.New(c.svc, aws.NewConfig().WithRegion(c.s3Region)).
+	//	GetObject(&s3.GetObjectInput{
+	//		Bucket: aws.String(c.s3Bucket),
+	//		Key:    aws.String("compressed/" + path),
+	//	})
+	//if err == nil {
+	//	buf := new(bytes.Buffer)
+	//	buf.ReadFrom(resp.Body)
+	//	data = buf.Bytes()
+	//	return
+	//}
 
-	resp, err = s3.New(c.svc, aws.NewConfig().WithRegion(c.s3Region)).
+	resp, err := s3.New(c.svc, aws.NewConfig().WithRegion(c.s3Region)).
 		GetObject(&s3.GetObjectInput{
 			Bucket: aws.String(c.s3Bucket),
 			Key:    aws.String(path),
