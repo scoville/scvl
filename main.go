@@ -70,6 +70,21 @@ func main() {
 		},
 	)
 
+	// Refresh redis
+	go func() {
+		for {
+			pages, err := sqlClient.FindDeletedPages()
+			if err != nil {
+				log.Printf("Deleted pages not found: %v\n", err)
+			} else {
+				for _, page := range pages {
+					redisClient.DeleteURL(page.Slug)
+				}
+			}
+			time.Sleep(time.Minute * 20)
+		}
+	}()
+
 	web.Digest = revision
 	w := web.New(engine, os.Getenv("SESSION_SECRET"), os.Getenv("MAIN_DOMAIN"))
 	log.Println("running http server on :8080")

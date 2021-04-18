@@ -2,6 +2,7 @@ package sql
 
 import (
 	"strings"
+	"time"
 
 	"github.com/scoville/scvl/src/domain"
 	"github.com/scoville/scvl/src/engine"
@@ -38,6 +39,15 @@ func (c *client) FindPages(params *engine.FindPagesRequest) (pages []*domain.Pag
 		c.db.Table(tblPageViews).Where("page_id = ?", p.ID).Count(&(p.ViewCount))
 	}
 
+	return
+}
+
+func (c *client) FindDeletedPages() (pages []*domain.Page, err error) {
+	db := c.db.Table(tblPages).
+		Where("status = ?", domain.PageStatusDeleted).
+		Where("updated_at > ?", time.Now().Add(-30*time.Minute))
+
+	err = db.Find(&pages).Error
 	return
 }
 
