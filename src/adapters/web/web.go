@@ -54,6 +54,7 @@ func (web *Web) Start(port string) error {
 	r.HandleFunc("/{slug}/qr.png", web.qrHandler).Methods(http.MethodGet)
 	r.Handle("/{slug}/edit", web.authenticate(web.editHandler)).Methods(http.MethodGet)
 	r.HandleFunc("/{slug}", web.redirectHandler).Methods(http.MethodGet)
+	r.HandleFunc("/{slug}/destroy", web.authenticate(web.destroyHandler)).Methods(http.MethodPost)
 	r.HandleFunc("/{slug}", web.authenticate(web.updateHandler)).Methods(http.MethodPost, http.MethodPut, http.MethodPatch)
 	r.HandleFunc("/oauth/google/callback", web.oauthCallbackHandler).Methods(http.MethodGet)
 	http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("css/"))))
@@ -72,7 +73,7 @@ func (web *Web) rootHandler(w http.ResponseWriter, r *http.Request) {
 	if ok {
 		resp["LoginURL"] = loginURL
 	}
-	renderTemplate(w, r, "/index.tpl", resp)
+	renderTemplate(w, r, "/index.html", resp)
 }
 
 func (web *Web) logoutHandler(w http.ResponseWriter, r *http.Request) {

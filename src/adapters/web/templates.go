@@ -32,7 +32,7 @@ func renderTemplate(w http.ResponseWriter, r *http.Request, path string, data ma
 	data["FileHost"] = scheme + os.Getenv("FILE_DOMAIN")
 	data["ImageHost"] = scheme + os.Getenv("IMAGE_DOMAIN")
 	data["EmailHost"] = scheme + os.Getenv("EMAIL_DOMAIN")
-	tpl := findTemplate("/layouts.tpl", path)
+	tpl := findTemplate("/layouts.html", path)
 	tpl.ExecuteTemplate(w, "base", data)
 }
 

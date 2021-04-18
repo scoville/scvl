@@ -39,7 +39,7 @@ var emailPasswordTemplate *template.Template
 // HTML returns email body in HTML
 func (e *FileEmail) HTML(fileDomain string, file *File) (string, error) {
 	if emailTemplate == nil {
-		emailTemplate = template.Must(template.ParseFiles("templates/file_email.tpl"))
+		emailTemplate = template.Must(template.ParseFiles("templates/file_email.html"))
 	}
 	scheme := "https://"
 	if strings.Contains(os.Getenv("MAIN_DOMAIN"), "localhost") {
@@ -61,7 +61,7 @@ func (e *FileEmail) HTML(fileDomain string, file *File) (string, error) {
 // PasswordHTML returns email body in HTML
 func (e *FileEmail) PasswordHTML(file *File, password string) (string, error) {
 	if emailPasswordTemplate == nil {
-		emailPasswordTemplate = template.Must(template.ParseFiles("templates/file_email_password.tpl"))
+		emailPasswordTemplate = template.Must(template.ParseFiles("templates/file_email_password.html"))
 	}
 
 	var buf bytes.Buffer
