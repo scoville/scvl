@@ -10,7 +10,6 @@ type SQLClient interface {
 	FindOrCreateUser(domain.User) (*domain.User, error)
 
 	FindPages(params *FindPagesRequest) (pages []*domain.Page, count int, err error)
-	FindDeletedPages() (pages []*domain.Page, err error)
 	FindPageBySlug(string) (*domain.Page, error)
 	CreatePage(*domain.Page) error
 	UpdatePage(*domain.Page, *domain.Page) error
