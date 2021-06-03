@@ -50,16 +50,25 @@ func (web *Web) pagesHandler(w http.ResponseWriter, r *http.Request) {
 			end = uint(count)
 		}
 		resp["End"] = end
+		q := ""
+		if req.Query != "" {
+			splitted := strings.Split(req.Query, "/")
+			slug := splitted[len(splitted)-1]
+			q += "&q=%2F" + slug
+			resp["Query"] = "/" + slug
+		}
+
 		if req.Offset > 0 {
-			prevOffset := req.Offset - req.Limit
+			prevOffset := int(req.Offset) - int(req.Limit)
 			if prevOffset < 0 {
 				prevOffset = 0
 			}
-			resp["PrevURL"] = fmt.Sprintf("/pages?offset=%d&limit=%d", prevOffset, req.Limit)
+			resp["PrevURL"] = fmt.Sprintf("/pages?offset=%d&limit=%d", prevOffset, req.Limit) + q
+
 		}
 		if req.Offset+req.Limit < uint(count) {
 			nextOffset := req.Offset + req.Limit
-			resp["NextURL"] = fmt.Sprintf("/pages?offset=%d&limit=%d", nextOffset, req.Limit)
+			resp["NextURL"] = fmt.Sprintf("/pages?offset=%d&limit=%d", nextOffset, req.Limit) + q
 		}
 	} else {
 		resp["Pages"] = make([]*domain.Page, 0)
@@ -69,7 +78,7 @@ func (web *Web) pagesHandler(w http.ResponseWriter, r *http.Request) {
 	if ok {
 		resp["LoginURL"] = loginURL
 	}
-	renderTemplate(w, r, "/pages.tpl", resp)
+	renderTemplate(w, r, "/pages.html", resp)
 }
 
 func (web *Web) shortenHandler(w http.ResponseWriter, r *http.Request) {
@@ -117,7 +126,7 @@ func (web *Web) redirectHandler(w http.ResponseWriter, r *http.Request) {
 			"URL": url,
 			"OGP": ogp,
 		}
-		tpl := findTemplateWithoutBase("/redirect.tpl")
+		tpl := findTemplateWithoutBase("/redirect.html")
 		tpl.Execute(w, data)
 		return
 	}
@@ -163,7 +172,7 @@ func (web *Web) editHandler(w http.ResponseWriter, r *http.Request) {
 	if page.OGP != nil {
 		resp["OGP"] = true
 	}
-	renderTemplate(w, r, "/edit.tpl", resp)
+	renderTemplate(w, r, "/edit.html", resp)
 }
 
 func (web *Web) updateHandler(w http.ResponseWriter, r *http.Request) {
@@ -192,4 +201,28 @@ func (web *Web) updateHandler(w http.ResponseWriter, r *http.Request) {
 	})
 	setFlash(w, "message", bytes)
 	http.Redirect(w, r, "/"+page.Slug+"/edit", http.StatusSeeOther)
+}
+
+func (web *Web) destroyHandler(w http.ResponseWriter, r *http.Request) {
+	user, ok := context.Get(r, "user").(*domain.User)
+	if !ok {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	_, err := web.engine.UpdatePage(&engine.UpdatePageRequest{
+		Slug:   mux.Vars(r)["slug"],
+		Status: domain.PageStatusDeleted,
+		UserID: int(user.ID),
+	})
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
+		return
+	}
+
+	bytes, _ := json.Marshal(map[string]string{
+		"Success": "Successfully deleted.",
+	})
+	setFlash(w, "message", bytes)
+	http.Redirect(w, r, "/pages", http.StatusSeeOther)
 }

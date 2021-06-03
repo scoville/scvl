@@ -12,9 +12,10 @@ import (
 
 // FindPagesRequest is the request struct for FindPages()
 type FindPagesRequest struct {
-	Limit  uint `form:"limit"`
-	Offset uint `form:"offset"`
-	UserID uint `form:"-"`
+	Query  string `form:"q"`
+	Limit  uint   `form:"limit"`
+	Offset uint   `form:"offset"`
+	UserID uint   `form:"-"`
 }
 
 // FindPages returns the pages
@@ -140,6 +141,7 @@ func (e *Engine) Access(req *AccessRequest) (url string, ogp *domain.OGP, err er
 // UpdatePageRequest is the request struct for UpdatePage function
 type UpdatePageRequest struct {
 	Slug         string
+	Status       string
 	UserID       int
 	URL          string
 	CustomizeOGP bool
@@ -150,32 +152,44 @@ type UpdatePageRequest struct {
 
 // UpdatePage updates the page
 func (e *Engine) UpdatePage(req *UpdatePageRequest) (page *domain.Page, err error) {
-	if req.URL == "" {
-		err = errors.New("url cannot be empty")
-		return
-	}
-
 	page, err = e.sqlClient.FindPageBySlug(req.Slug)
 	if err != nil {
 		return
 	}
 
 	if page.UserID != req.UserID {
-		err = errors.New("You don't have permission to edit it")
+		err = errors.New("you don't have permission to edit it")
 		return
 	}
 
-	title, err := e.fetchTitle(req.UserID, req.URL)
+	params := &domain.Page{}
+
+	if req.URL != "" {
+		var title string
+		title, err = e.fetchTitle(req.UserID, req.URL)
+		if err != nil {
+			return
+		}
+		params.URL = req.URL
+		params.Title = title
+	}
+
+	if req.Status != "" {
+		params.Status = req.Status
+	}
+
+	err = e.sqlClient.UpdatePage(page, params)
 	if err != nil {
 		return
 	}
 
-	err = e.sqlClient.UpdatePage(page, &domain.Page{URL: req.URL, Title: title})
-	if err != nil {
-		return
+	if req.Status == domain.PageStatusDeleted {
+		e.redisClient.DeleteURL(req.Slug)
 	}
 
-	e.redisClient.SetURL(req.Slug, req.URL)
+	if req.URL != "" {
+		e.redisClient.SetURL(req.Slug, req.URL)
+	}
 
 	if req.CustomizeOGP {
 		var ogpID int

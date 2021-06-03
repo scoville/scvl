@@ -1,6 +1,8 @@
 package sql
 
 import (
+	"strings"
+
 	"github.com/scoville/scvl/src/domain"
 	"github.com/scoville/scvl/src/engine"
 )
@@ -10,7 +12,14 @@ const tblPages = "pages"
 func (c *client) FindPages(params *engine.FindPagesRequest) (pages []*domain.Page, count int, err error) {
 	db := c.db.Table(tblPages).
 		Where("user_id = ?", params.UserID).
-		Count(&count)
+		Where("status = ?", domain.PageStatusActive)
+
+	if params.Query != "" {
+		splitted := strings.Split(params.Query, "/")
+		db = db.Where("slug = ?", splitted[len(splitted)-1])
+	}
+
+	db = db.Count(&count)
 
 	if params.Limit != 0 {
 		db = db.Limit(params.Limit)
@@ -35,6 +44,7 @@ func (c *client) FindPages(params *engine.FindPagesRequest) (pages []*domain.Pag
 func (c *client) FindPageBySlug(slug string) (page *domain.Page, err error) {
 	page = &domain.Page{}
 	err = c.db.Table(tblPages).
+		Where("status = ?", domain.PageStatusActive).
 		Preload("OGP").
 		First(page, "slug = ?", slug).Error
 	return

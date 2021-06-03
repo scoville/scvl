@@ -33,7 +33,7 @@ func (web *Web) filesHandler(w http.ResponseWriter, r *http.Request) {
 	if ok {
 		resp["LoginURL"] = loginURL
 	}
-	renderTemplate(w, r, "/files.tpl", resp)
+	renderTemplate(w, r, "/files.html", resp)
 }
 
 func (web *Web) fileUploadHandler(w http.ResponseWriter, r *http.Request) {
@@ -129,7 +129,7 @@ func (web *Web) fileShowHandler(w http.ResponseWriter, r *http.Request) {
 		resp["Downloadable"] = true
 	}
 
-	renderTemplate(w, r, "/file.tpl", resp)
+	renderTemplate(w, r, "/file.html", resp)
 }
 
 func (web *Web) fileDownloadHandler(w http.ResponseWriter, r *http.Request) {
@@ -190,7 +190,7 @@ func (web *Web) editFileHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	resp["File"] = file
-	renderTemplate(w, r, "/file_edit.tpl", resp)
+	renderTemplate(w, r, "/file_edit.html", resp)
 }
 
 func (web *Web) updateFileHandler(w http.ResponseWriter, r *http.Request) {

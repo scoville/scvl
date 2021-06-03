@@ -24,7 +24,7 @@ func (web *Web) imagesHandler(w http.ResponseWriter, r *http.Request) {
 	if ok {
 		resp["LoginURL"] = loginURL
 	}
-	renderTemplate(w, r, "/images.tpl", resp)
+	renderTemplate(w, r, "/images.html", resp)
 }
 
 func (web *Web) imageUploadHandler(w http.ResponseWriter, r *http.Request) {

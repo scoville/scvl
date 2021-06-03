@@ -22,7 +22,7 @@ func (web *Web) emailsHandler(w http.ResponseWriter, r *http.Request) {
 	if ok {
 		resp["LoginURL"] = loginURL
 	}
-	renderTemplate(w, r, "/emails.tpl", resp)
+	renderTemplate(w, r, "/emails.html", resp)
 }
 
 func (web *Web) emailCreateHandler(w http.ResponseWriter, r *http.Request) {
@@ -50,7 +50,7 @@ func (web *Web) emailCreateHandler(w http.ResponseWriter, r *http.Request) {
 	resp := map[string]interface{}{
 		"EmailTemplate": emailTemplate,
 	}
-	renderTemplate(w, r, "/email_preview.tpl", resp)
+	renderTemplate(w, r, "/email_preview.html", resp)
 }
 
 func (web *Web) emailSendHandler(w http.ResponseWriter, r *http.Request) {

@@ -76,43 +76,60 @@
 
 {{if .User}}
   <h2>{{.User.Name}}の短縮したURL一覧</h2>
-  <p>全{{.Count}}件中、{{.Start}}〜{{.End}}を表示中</p>
-  <table class="table urls">
-    <tr>
-      <th width="80">短縮URL</th>
-      <th>リダイレクト先URL</th>
-      <th width="100">QRコード</th>
-      <th width="100">クリック数</th>
-      <th width="100">編集</th>
-    </tr>
-    {{range .Pages}}
+  <form class="form-inline" action="/pages" method="get">
+    <div class="form-group mb-2 mx-sm-3">
+      <label class="sr-only" for="q">短縮URL</label>
+      <input class="form-control" name="q" value="{{.Query}}" type="search" placeholder="/3n0fy">
+    </div>
+    <button type="submit" class="btn btn-secondary mb-2"> 短縮URLで検索</button>
+  </form>
+  {{if eq .Count 0}}
+    <p>短縮したURLが見つかりませんでした。</p>
+  {{else}}
+    <p>全{{.Count}}件中、{{.Start}}〜{{.End}}を表示中</p>
+    <table class="table urls">
       <tr>
-        <td><a href="/{{.Slug}}" target="_blank">/{{.Slug}}</a></td>
-        <td>
-          <div class="truncate">
-            <a href="{{.URL}}" target="_blank">
-              {{.URL}}
-            </a>
-          </div>
-          <div class="truncate mt10">{{.Title}}</div>
-        </td>
-        <td class="qr">
-          <a href="/{{.Slug}}/qr.png" target="_blank">
-            <img src="/{{.Slug}}/qr.png">
-          </a>
-        </td>
-        <td>{{.ViewCount}}</td>
-        <td>
-          <a href="/{{.Slug}}/edit" class="btn btn-default">編集</a>
-        </td>
+        <th width="80">短縮URL</th>
+        <th>リダイレクト先URL</th>
+        <th width="100">QRコード</th>
+        <th width="100">クリック数</th>
+        <th width="100">編集</th>
+        <th width="100">削除</th>
       </tr>
+      {{range .Pages}}
+        <tr>
+          <td><a href="/{{.Slug}}" target="_blank">/{{.Slug}}</a></td>
+          <td>
+            <div class="truncate">
+              <a href="{{.URL}}" target="_blank">
+                {{.URL}}
+              </a>
+            </div>
+            <div class="truncate mt10">{{.Title}}</div>
+          </td>
+          <td class="qr">
+            <a href="/{{.Slug}}/qr.png" target="_blank">
+              <img src="/{{.Slug}}/qr.png">
+            </a>
+          </td>
+          <td>{{.ViewCount}}</td>
+          <td>
+            <a href="/{{.Slug}}/edit" class="btn btn-default">編集</a>
+          </td>
+          <td>
+            <form action="/{{.Slug}}/destroy" method="post">
+              <button class="btn btn-danger" data-confirm="本当に削除して宜しいですか？">削除</button>
+            </form>
+          </td>
+        </tr>
+      {{end}}
+    </table>
+    {{if .PrevURL}}
+      <a href="{{.PrevURL}}" class="btn btn-default">前のページへ</a>
     {{end}}
-  </table>
-  {{if .PrevURL}}
-    <a href="{{.PrevURL}}" class="btn btn-default">前のページへ</a>
-  {{end}}
-  {{if .NextURL}}
-    <a href="{{.NextURL}}" class="btn btn-default">次のページへ</a>
+    {{if .NextURL}}
+      <a href="{{.NextURL}}" class="btn btn-default">次のページへ</a>
+    {{end}}
   {{end}}
 {{end}}
 {{end}}

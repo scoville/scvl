@@ -10,6 +10,7 @@ type Page struct {
 	DeletedAt *time.Time `sql:"index"`
 	UserID    int        `json:"user_id" gorm:"index; not null"`
 	Slug      string     `json:"slug" gorm:"unique_index; not null"`
+	Status    string     `json:"status" gorm:"default:'active'"`
 	Title     string     `json:"title"`
 	URL       string     `json:"url"`
 	Views     []PageView `json:"views"`
@@ -17,3 +18,6 @@ type Page struct {
 
 	OGP *OGP `json:"ogp"`
 }
+
+const PageStatusActive = "active"
+const PageStatusDeleted = "delted"
