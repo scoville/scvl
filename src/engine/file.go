@@ -35,6 +35,7 @@ type UploadFileRequest struct {
 	UserID          int
 	ValidDays       int
 	SendEmail       bool
+	DirectDownload  bool
 	ReceiverAddress string
 	ReceiverName    string
 	SenderName      string
@@ -70,6 +71,7 @@ func (e *Engine) UploadFile(req UploadFileRequest) (file *domain.File, err error
 		Deadline:          deadline,
 		Path:              path,
 		DownloadLimit:     req.DownloadLimit,
+		DirectDownload:    req.DirectDownload,
 	}
 	err = e.sqlClient.CreateFile(file)
 	if err != nil {

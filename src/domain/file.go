@@ -18,6 +18,7 @@ type File struct {
 	Deadline          *time.Time `json:"deadline"`
 	Path              string     `json:"path"`
 	DownloadLimit     int        `json:"download_limit"`
+	DirectDownload    bool       `json:"direct_download"`
 
 	Downloads     []FileDownload `json:"file_downloads"`
 	DownloadCount uint           `json:"download_count" gorm:"-"`

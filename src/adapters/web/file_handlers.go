@@ -73,7 +73,13 @@ func (web *Web) fileUploadHandler(w http.ResponseWriter, r *http.Request) {
 	req.FileName = info.Filename
 	req.FileSize = info.Size
 
+	if r.FormValue("direct_download") == "on" && req.Password != "" {
+		http.Error(w, "Cannot set password when you skip the downloading page", http.StatusUnprocessableEntity)
+		return
+	}
+
 	req.SendEmail = r.FormValue("email") == "on"
+	req.DirectDownload = r.FormValue("direct_download") == "on"
 	req.ReceiverAddress = r.FormValue("receiver_address")
 	req.ReceiverName = r.FormValue("receiver_name")
 	req.SenderName = r.FormValue("sender_name")
@@ -108,6 +114,11 @@ func (web *Web) fileShowHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
+	if file.DirectDownload {
+		web.downloadFile(w, r, slug, "")
+		return
+	}
+
 	resp["File"] = file
 
 	if err := file.Downloadable(); err != nil {
@@ -122,10 +133,13 @@ func (web *Web) fileShowHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (web *Web) fileDownloadHandler(w http.ResponseWriter, r *http.Request) {
-	slug := mux.Vars(r)["slug"]
+	web.downloadFile(w, r, mux.Vars(r)["slug"], r.FormValue("password"))
+}
+
+func (web *Web) downloadFile(w http.ResponseWriter, r *http.Request, slug, password string) {
 	fileName, data, err := web.engine.DownloadFile(&engine.DownloadFileRequest{
 		Slug:      slug,
-		Password:  r.FormValue("password"),
+		Password:  password,
 		RealIP:    realip.RealIP(r),
 		Referer:   r.Referer(),
 		UserAgent: r.UserAgent(),

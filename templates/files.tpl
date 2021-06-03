@@ -48,6 +48,9 @@
           <input type="checkbox" name="send_password">パスワードを別のメールで自動送信する
         </label>
       </div>
+      <label class="mt20">
+        <input id="direct_download" type="checkbox" name="direct_download">ダウンロードページをスキップ
+      </label>
       <div class="mt20">
         <input type="submit" value="送信" class="btn btn-primary">
       </div>
