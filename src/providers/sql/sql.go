@@ -20,6 +20,7 @@ func NewClient(dbURL string) (engine.SQLClient, error) {
 		return nil, err
 	}
 	db.AutoMigrate(
+		&domain.APIKey{},
 		&domain.FileEmail{},
 		&domain.FileDownload{},
 		&domain.File{},

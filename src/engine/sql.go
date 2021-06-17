@@ -6,6 +6,8 @@ import "github.com/scoville/scvl/src/domain"
 type SQLClient interface {
 	Close() error
 
+	FindAPIKey(string) (*domain.APIKey, error)
+
 	FindUser(uint) (*domain.User, error)
 	FindOrCreateUser(domain.User) (*domain.User, error)
 

@@ -6,6 +6,7 @@ import (
 	"github.com/gorilla/context"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
+	"github.com/scoville/scvl/src/adapters/web/api"
 	"github.com/scoville/scvl/src/domain"
 	"github.com/scoville/scvl/src/engine"
 )
@@ -32,6 +33,9 @@ func New(e *engine.Engine, sessionSecret, mainDomain string) *Web {
 // Start starts listen and serve
 func (web *Web) Start(port string) error {
 	r := mux.NewRouter()
+
+	api := api.New(web.engine)
+	api.Handle(r)
 
 	r.Handle("/", web.authenticate(web.rootHandler)).Methods(http.MethodGet)
 	r.Handle("/logout", web.authenticate(web.logoutHandler)).Methods(http.MethodPost)
