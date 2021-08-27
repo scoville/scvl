@@ -37,6 +37,9 @@ body {
   margin-top: 20px;
 }
 
+table {
+  max-width: 100%;
+}
 table.urls {
   table-layout: fixed;
 }
@@ -47,10 +50,10 @@ table.urls {
   -o-text-overflow: ellipsis;
   overflow: hidden;
 }
-.qr img{
+.qr img {
   height: 88px;
 }
-.mt20{
+.mt20 {
   margin-top: 20px;
 }
 
@@ -73,11 +76,11 @@ input#shortenUrl {
   text-align: center;
   padding: 5px 0;
   border-radius: 6px;
- 
+
   position: absolute;
   z-index: 1;
   bottom: 112%;
-  left: 50%; 
+  left: 50%;
   margin-left: -60px;
 }
 
@@ -89,7 +92,9 @@ input#shortenUrl {
   cursor: pointer;
 }
 
-.toggle-utm, .toggle-ogp, .toggle-email {
+.toggle-utm,
+.toggle-ogp,
+.toggle-email {
   display: block;
   margin: 12px 0;
 }
@@ -98,7 +103,9 @@ input[type="checkbox"] {
   margin-right: 8px;
 }
 
-.utm-information, .ogp-information, .email-information {
+.utm-information,
+.ogp-information,
+.email-information {
   display: none;
 }
 

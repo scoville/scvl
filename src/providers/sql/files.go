@@ -7,6 +7,7 @@ const tblFiles = "files"
 func (c *client) FindFileBySlug(slug string) (file *domain.File, err error) {
 	file = &domain.File{}
 	err = c.db.Table(tblFiles).
+		Where("status = ?", domain.FileStatusActive).
 		First(&file, "slug = ?", slug).Error
 	if err != nil {
 		return

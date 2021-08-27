@@ -15,6 +15,7 @@ type File struct {
 	UserID            int        `json:"user_id" gorm:"index; not null"`
 	EncryptedPassword string     `json:"encrypted_password"`
 	Slug              string     `json:"slug" gorm:"unique_index; not null"`
+	Status            string     `json:"status" gorm:"default:'active'"`
 	Deadline          *time.Time `json:"deadline"`
 	Path              string     `json:"path"`
 	DownloadLimit     int        `json:"download_limit"`
@@ -24,6 +25,9 @@ type File struct {
 	DownloadCount uint           `json:"download_count" gorm:"-"`
 	Email         *FileEmail     `json:"email"`
 }
+
+const FileStatusActive = "active"
+const FileStatusDeleted = "delted"
 
 // Name returns the name of the file
 func (f *File) Name() string {

@@ -237,3 +237,27 @@ func (web *Web) updateFileHandler(w http.ResponseWriter, r *http.Request) {
 	setFlash(w, "message", bytes)
 	http.Redirect(w, r, "/files/"+file.Slug+"/edit", http.StatusSeeOther)
 }
+
+func (web *Web) destroyFileHandler(w http.ResponseWriter, r *http.Request) {
+	user, ok := context.Get(r, "user").(*domain.User)
+	if !ok {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	_, err := web.engine.UpdateFile(&engine.UpdateFileRequest{
+		Slug:   mux.Vars(r)["slug"],
+		Status: domain.FileStatusDeleted,
+		UserID: int(user.ID),
+	})
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
+		return
+	}
+
+	bytes, _ := json.Marshal(map[string]string{
+		"Success": "Successfully deleted.",
+	})
+	setFlash(w, "message", bytes)
+	http.Redirect(w, r, "/files", http.StatusSeeOther)
+}

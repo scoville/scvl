@@ -149,6 +149,7 @@ func (e *Engine) DownloadFile(req *DownloadFileRequest) (fileName string, data [
 // UpdateFileRequest is the request struct for UpdateFile function
 type UpdateFileRequest struct {
 	Slug          string
+	Status        string
 	DownloadLimit int
 	File          multipart.File
 	FileName      string
@@ -169,24 +170,29 @@ func (e *Engine) UpdateFile(req *UpdateFileRequest) (file *domain.File, err erro
 		return
 	}
 
-	path := fmt.Sprintf("%d/%s/%s", req.UserID, req.Slug, req.FileName)
-	err = e.awsClient.UploadToS3(req.File, path)
-	if err != nil {
-		return
+	path := file.Path
+	if req.FileName != "" {
+		path = fmt.Sprintf("%d/%s/%s", req.UserID, req.Slug, req.FileName)
+		err = e.awsClient.UploadToS3(req.File, path)
+		if err != nil {
+			return
+		}
 	}
 
 	encryptedPassword := ""
 	if req.Password != "" {
 		encryptedPassword = domain.Encrypt(req.Password)
 	}
+	status := req.Status
+	if status == "" {
+		status = file.Status
+	}
 
 	err = e.sqlClient.UpdateFile(file, &domain.File{
 		EncryptedPassword: encryptedPassword,
 		Path:              path,
 		DownloadLimit:     req.DownloadLimit,
+		Status:            status,
 	})
-	if err != nil {
-		return
-	}
 	return
 }
