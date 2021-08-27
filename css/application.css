@@ -39,6 +39,7 @@ body {
 
 table {
   max-width: 100%;
+  table-layout: fixed;
 }
 table.urls {
   table-layout: fixed;
