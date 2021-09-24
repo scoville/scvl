@@ -42,10 +42,6 @@ func (e *Engine) SendEmail(req *CreateEmailRequest) (err error) {
 		if err != nil {
 			return
 		}
-		err = e.sqlClient.CreateEmail(email)
-		if err != nil {
-			return
-		}
 		time.Sleep(3 * time.Second)
 	}
 	return
@@ -93,9 +89,12 @@ func (e *Engine) createEmailTemplate(req *CreateEmailRequest) (emailTemplate *do
 		keys = append(keys, col.Value)
 	}
 	variables := make(map[string]string, len(keys))
-	for _, row := range sheet.Rows {
-		for i, col := range row {
-			variables[keys[i]] = col.Value
+	for i, row := range sheet.Rows {
+		if i == 0 {
+			continue
+		}
+		for t, col := range row {
+			variables[keys[t]] = col.Value
 		}
 		to, ok := variables["email"]
 		if !ok {
@@ -109,5 +108,7 @@ func (e *Engine) createEmailTemplate(req *CreateEmailRequest) (emailTemplate *do
 		}
 		emailTemplate.BatchEmail.Emails = append(emailTemplate.BatchEmail.Emails, email)
 	}
-	return emailTemplate, nil
+	emailTemplate.BatchEmail.SentCount = len(emailTemplate.BatchEmail.Emails)
+	err = e.sqlClient.CreateEmailTemplate(emailTemplate)
+	return emailTemplate, err
 }

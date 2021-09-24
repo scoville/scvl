@@ -14,4 +14,6 @@ type BatchEmail struct {
 	SpreadsheetURL  string   `json:"spreadsheet_url"`
 	SheetName       string   `json:"sheet_name"`
 	Emails          []*Email `json:"emails"`
+	OpenCount       int      `json:"open_count"`
+	SentCount       int      `json:"sent_count"`
 }

@@ -5,7 +5,7 @@ go 1.12
 require (
 	github.com/Iwark/spreadsheet v0.0.0-20190731183439-815c2aaa68d2
 	github.com/Songmu/make2help v0.2.0 // indirect
-	github.com/aws/aws-sdk-go v1.19.6
+	github.com/aws/aws-sdk-go v1.40.48
 	github.com/denisenkom/go-mssqldb v0.0.0-20190515213511-eb9f6a1743f3 // indirect
 	github.com/erikstmartin/go-testdb v0.0.0-20160219214506-8d10e4a1bae5 // indirect
 	github.com/garyburd/redigo v1.6.0

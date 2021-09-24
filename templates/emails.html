@@ -46,13 +46,20 @@
   <table class="table emails">
     <tr>
       <th width="80">スプレッドシートのURL</th>
-      <th width="140">開封数 / 送信数</th>
+      <th width="140">メールタイトル</th>
+      <th width="80">送信日時</th>
+      <th width="72">開封数 / 送信数</th>
     </tr>
-    {{range .User.Emails}}
+    {{range .User.EmailTemplates}}
       <tr>
-        <td class="truncate">{{.SpreadsheetURL}}</td>
-        <td class="truncate"></td>
-        <td>{{.OpenCount}} / {{.SentCount}}</td>
+        <td class="truncate">
+          <a href="{{.BatchEmail.SpreadsheetURL}}" target="_blank">
+            {{.BatchEmail.SpreadsheetURL}}
+          </a>
+        </td>
+        <td class="truncate">{{.Title}}</td>
+        <td class="truncate">{{.FormatCreatedAt}}</td>
+        <td>{{.BatchEmail.OpenCount}} / {{.BatchEmail.SentCount}}</td>
       </tr>
     {{end}}
   </table>

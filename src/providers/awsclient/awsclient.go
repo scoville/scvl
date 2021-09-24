@@ -182,14 +182,14 @@ func (c *awsClient) SendFileEmail(file *domain.File, password string) (err error
 
 func (c *awsClient) SendEmail(email *domain.Email, sender string) (err error) {
 	svc := ses.New(c.svc, aws.NewConfig().WithRegion(c.sesRegion))
-	if err = sendEmail(svc, email, sender); err != nil {
+	if err = c.sendEmail(svc, email, sender); err != nil {
 		return
 	}
 	return
 }
 
 // Todo: SendFileNameでも使えるようにする
-func sendEmail(svc *ses.SES, email *domain.Email, sender string) (err error) {
+func (c *awsClient) sendEmail(svc *ses.SES, email *domain.Email, sender string) (err error) {
 	_, err = svc.SendEmail(&ses.SendEmailInput{
 		Destination: &ses.Destination{
 			ToAddresses:  []*string{&email.To},
@@ -207,6 +207,7 @@ func sendEmail(svc *ses.SES, email *domain.Email, sender string) (err error) {
 				Data:    aws.String(email.Title),
 			},
 		},
+		Source: aws.String(c.mailFrom.String()),
 	})
 	return
 }

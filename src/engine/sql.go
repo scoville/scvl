@@ -33,6 +33,6 @@ type SQLClient interface {
 
 	CreateImage(image *domain.Image) error
 
-	CreateEmail(email *domain.Email) error
+	CreateEmailTemplate(emailTemplate *domain.EmailTemplate) error
 	ReadEmail(emailID string) error
 }
