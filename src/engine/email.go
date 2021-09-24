@@ -104,7 +104,7 @@ func (e *Engine) createEmailTemplate(req *CreateEmailRequest) (emailTemplate *do
 		}
 		to, ok := variables["email"]
 		if !ok {
-			err = errors.New("シートから送信先のemailが見つかりませんでした")
+			err = errors.New("シートにemail列が存在するか確認してください")
 			return
 		}
 		var email *domain.Email
