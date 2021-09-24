@@ -207,7 +207,7 @@ func (c *awsClient) sendEmail(svc *ses.SES, email *domain.Email, sender string) 
 				Data:    aws.String(email.Title),
 			},
 		},
-		Source: aws.String(c.mailFrom.String()),
+		Source: aws.String(sender),
 	})
 	return
 }
