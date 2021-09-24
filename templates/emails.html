@@ -5,7 +5,7 @@
     <a href="{{.LoginURL}}" class="login btn btn-primary btn-lg">ログイン</a>
   {{else}}
     <p>メールの一括送信ができます</p>
-    <form action="{{if .IsEmailDomain}}/{{else}}/emails{{end}}" method="post">
+    <form action="{{if .IsEmailHost}}/{{else}}/emails{{end}}" method="post">
       <input type="hidden" name="preview" value="1" />
       <div class="form-group">
         <label for="spreadsheet_url">Spreadsheet URL</label>
