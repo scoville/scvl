@@ -199,7 +199,7 @@ func (c *awsClient) sendEmail(svc *ses.SES, email *domain.Email, sender string) 
 			Body: &ses.Body{
 				Html: &ses.Content{
 					Charset: aws.String("UTF-8"),
-					Data:    aws.String(email.Body),
+					Data:    aws.String(strings.Replace(email.Body, "\n", "<br>", -1)),
 				},
 			},
 			Subject: &ses.Content{
