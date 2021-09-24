@@ -4,11 +4,11 @@
   {{if .LoginURL}}
     <a href="{{.LoginURL}}" class="login btn btn-primary btn-lg">ログイン</a>
   {{else}}
-    <p>メールの一括送信ができます</p>
+    <p>メールの一括送信ができます。一通あたり1秒〜2秒ほどの時間がかかります。<br />一度に送信するメールは300通以下にしてください。</p>
     <form action="{{if .IsEmailHost}}/{{else}}/emails{{end}}" method="post">
       <input type="hidden" name="preview" value="1" />
       <div class="form-group">
-        <label for="spreadsheet_url">Spreadsheet URL</label>
+        <label for="spreadsheet_url">Spreadsheet URL <a href="https://docs.google.com/spreadsheets/d/1_HyXYMM8mv2pHmgTk5c0VmE2Ypcj40r73MPtlKhHHAM/edit?usp=sharing" target="_blank">サンプル</a></label>
         <input type="url" name="spreadsheet_url" value="" class="form-control" required />
       </div>
       <div class="form-group">

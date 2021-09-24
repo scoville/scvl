@@ -23,7 +23,6 @@ type CreateEmailRequest struct {
 
 // CreateEmail creates an email
 func (e *Engine) CreateEmail(req *CreateEmailRequest) (emailTemplate *domain.EmailTemplate, err error) {
-
 	emailTemplate, err = e.createEmailTemplate(req)
 	return
 }
@@ -35,15 +34,22 @@ func (e *Engine) SendEmail(req *CreateEmailRequest) (err error) {
 	if err != nil {
 		return
 	}
-	for _, email := range emailTemplate.BatchEmail.Emails {
-		openConfirmationCode := fmt.Sprintf(`<img src="https://%s/%d/read">`, os.Getenv("EMAIL_DOMAIN"), email.ID)
-		email.Body = email.Body + openConfirmationCode
-		err = e.awsClient.SendEmail(email, emailTemplate.BatchEmail.Sender)
-		if err != nil {
-			return
-		}
-		time.Sleep(3 * time.Second)
+	err = e.sqlClient.CreateEmailTemplate(emailTemplate)
+	if err != nil {
+		return
 	}
+	go (func() {
+		for _, email := range emailTemplate.BatchEmail.Emails {
+			openConfirmationCode := fmt.Sprintf(`<img src="https://%s/%d/read">`, os.Getenv("EMAIL_DOMAIN"), email.ID)
+			email.Body = email.Body + openConfirmationCode
+			err = e.awsClient.SendEmail(email, emailTemplate.BatchEmail.Sender)
+			if err != nil {
+				return
+			}
+			time.Sleep(1 * time.Second)
+		}
+	})()
+	
 	return
 }
 
@@ -109,6 +115,5 @@ func (e *Engine) createEmailTemplate(req *CreateEmailRequest) (emailTemplate *do
 		emailTemplate.BatchEmail.Emails = append(emailTemplate.BatchEmail.Emails, email)
 	}
 	emailTemplate.BatchEmail.SentCount = len(emailTemplate.BatchEmail.Emails)
-	err = e.sqlClient.CreateEmailTemplate(emailTemplate)
-	return emailTemplate, err
+	return emailTemplate, nil
 }

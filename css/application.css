@@ -12,6 +12,7 @@ body {
 }
 .jumbotron ul.menu li {
   flex-basis: 30%;
+  margin: 16px 0;
   height: 44px;
   line-height: 44px;
   border: 1px solid #aaa;
