@@ -13,6 +13,17 @@ import (
 var templates = map[string]*template.Template{}
 var baseTplPath = "templates"
 
+var tempFuncs = map[string]interface{}{
+	// Replaces newlines with <br>
+	"nl2br": func(text string) template.HTML {
+			return template.HTML(strings.Replace(template.HTMLEscapeString(text), "\n", "<br>", -1))
+	},
+	// Skips sanitation on the parameter.  Do not use with dynamic data.
+	"raw": func(text string) template.HTML {
+			return template.HTML(text)
+	},
+}
+
 func renderTemplate(w http.ResponseWriter, r *http.Request, path string, data map[string]interface{}) {
 	data["Digest"] = Digest
 	scheme := "https://"
@@ -39,28 +50,28 @@ func renderTemplate(w http.ResponseWriter, r *http.Request, path string, data ma
 // cache templates so that it doesn't parse files every time in production
 func findTemplate(basePath, path string) (tpl *template.Template) {
 	if Digest == "" {
-		tpl = template.Must(template.ParseFiles(baseTplPath+basePath, baseTplPath+path))
+		tpl = template.Must(template.New(path).Funcs(tempFuncs).ParseFiles(baseTplPath+basePath, baseTplPath+path))
 		return
 	}
 	tpl, ok := templates[path]
 	if ok {
 		return
 	}
-	tpl = template.Must(template.ParseFiles(baseTplPath+basePath, baseTplPath+path))
+	tpl = template.Must(template.New(path).Funcs(tempFuncs).ParseFiles(baseTplPath+basePath, baseTplPath+path))
 	templates[path] = tpl
 	return
 }
 
 func findTemplateWithoutBase(path string) (tpl *template.Template) {
 	if Digest == "" {
-		tpl = template.Must(template.ParseFiles(baseTplPath + path))
+		tpl = template.Must(template.New(path).Funcs(tempFuncs).ParseFiles(baseTplPath + path))
 		return
 	}
 	tpl, ok := templates[path]
 	if ok {
 		return
 	}
-	tpl = template.Must(template.ParseFiles(baseTplPath + path))
+	tpl = template.Must(template.New(path).Funcs(tempFuncs).ParseFiles(baseTplPath + path))
 	templates[path] = tpl
 	return
 }
