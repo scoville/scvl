@@ -126,8 +126,18 @@ func (web *Web) redirectHandler(w http.ResponseWriter, r *http.Request) {
 			"URL": url,
 			"OGP": ogp,
 		}
-		tpl := findTemplateWithoutBase("/redirect.html")
-		tpl.Execute(w, data)
+		tpl, err := findTemplateWithoutBase("/redirect.html")
+		if err != nil {
+			log.Println(err.Error())
+			http.Error(w, "Template error", http.StatusInternalServerError)
+			return
+		}
+		err = tpl.Execute(w, data)
+		if err != nil {
+			log.Println(err.Error())
+			http.Error(w, "Template execution error", http.StatusInternalServerError)
+			return
+		}
 		return
 	}
 	http.Redirect(w, r, url, http.StatusTemporaryRedirect)

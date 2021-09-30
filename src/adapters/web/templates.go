@@ -62,16 +62,18 @@ func findTemplate(basePath, path string) (tpl *template.Template) {
 	return
 }
 
-func findTemplateWithoutBase(path string) (tpl *template.Template) {
+func findTemplateWithoutBase(path string) (tpl *template.Template, err error) {
+	paths := strings.Split(path, "/")
+	filename := paths[len(paths) - 1]
 	if Digest == "" {
-		tpl = template.Must(template.New(path).Funcs(tempFuncs).ParseFiles(baseTplPath + path))
+		tpl, err = template.New(filename).Funcs(tempFuncs).ParseFiles(baseTplPath + path)
 		return
 	}
 	tpl, ok := templates[path]
 	if ok {
 		return
 	}
-	tpl = template.Must(template.New(path).Funcs(tempFuncs).ParseFiles(baseTplPath + path))
+	tpl, err = template.New(filename).Funcs(tempFuncs).ParseFiles(baseTplPath + path)
 	templates[path] = tpl
 	return
 }
