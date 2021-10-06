@@ -28,6 +28,7 @@ require (
 	github.com/tomasen/realip v0.0.0-20180522021738-f0c99a92ddce
 	golang.org/x/crypto v0.0.0-20210415154028-4f45737414dc
 	golang.org/x/oauth2 v0.0.0-20190319182350-c85d3e98c914
+	golang.org/x/text v0.3.6
 	golang.org/x/tools v0.1.0 // indirect
 	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
 )

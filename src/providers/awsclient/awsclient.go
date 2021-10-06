@@ -4,8 +4,12 @@ import (
 	"bytes"
 	"errors"
 	"io"
+	"io/ioutil"
 	"net/mail"
 	"strings"
+
+	"golang.org/x/text/encoding/japanese"
+	"golang.org/x/text/transform"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
@@ -196,6 +200,18 @@ func (c *awsClient) sendEmail(svc *ses.SES, email *domain.Email, sender string) 
 			toAddresses = append(toAddresses, aws.String(strings.TrimSpace(email)))
 		}
 	}
+	source := sender
+	sepSender := strings.Split(sender, " <")
+	if len(sepSender) == 2 {
+		reader := strings.NewReader(sepSender[0])
+		transformer := japanese.ISO2022JP.NewEncoder()
+		var senderName []byte
+		senderName, err = ioutil.ReadAll(transform.NewReader(reader, transformer))
+		if err != nil {
+			return
+		}
+		source = string(senderName) + " <" + sepSender[1]
+	}
 	_, err = svc.SendEmail(&ses.SendEmailInput{
 		Destination: &ses.Destination{
 			ToAddresses:  toAddresses,
@@ -213,7 +229,7 @@ func (c *awsClient) sendEmail(svc *ses.SES, email *domain.Email, sender string) 
 				Data:    aws.String(email.Title),
 			},
 		},
-		Source: aws.String(sender),
+		Source: aws.String(source),
 	})
 	return
 }
