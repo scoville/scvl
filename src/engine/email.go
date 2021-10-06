@@ -47,6 +47,7 @@ func (e *Engine) SendEmail(req *CreateEmailRequest) (err error) {
 			if err != nil {
 				log.Println(err)
 			}
+			log.Printf("sent an email(id: %d) to: %s\n", email.ID, email.To)
 			time.Sleep(1 * time.Second)
 		}
 	})()
