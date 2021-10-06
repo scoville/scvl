@@ -3,6 +3,7 @@ package engine
 import (
 	"errors"
 	"fmt"
+	"log"
 	"os"
 	"strings"
 	"time"
@@ -44,7 +45,7 @@ func (e *Engine) SendEmail(req *CreateEmailRequest) (err error) {
 			email.Body = email.Body + openConfirmationCode
 			err = e.awsClient.SendEmail(email, emailTemplate.BatchEmail.Sender)
 			if err != nil {
-				return
+				log.Println(err)
 			}
 			time.Sleep(1 * time.Second)
 		}
