@@ -2,14 +2,11 @@ package awsclient
 
 import (
 	"bytes"
+	"encoding/base64"
 	"errors"
 	"io"
-	"io/ioutil"
 	"net/mail"
 	"strings"
-
-	"golang.org/x/text/encoding/japanese"
-	"golang.org/x/text/transform"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
@@ -203,14 +200,9 @@ func (c *awsClient) sendEmail(svc *ses.SES, email *domain.Email, sender string) 
 	source := sender
 	sepSender := strings.Split(sender, "<")
 	if len(sepSender) == 2 {
-		reader := strings.NewReader(strings.TrimSpace(sepSender[0]))
-		transformer := japanese.ISO2022JP.NewEncoder()
-		var senderName []byte
-		senderName, err = ioutil.ReadAll(transform.NewReader(reader, transformer))
-		if err != nil {
-			return
-		}
-		source = string(senderName) + " <" + sepSender[1]
+		b64SenderName := base64.StdEncoding.EncodeToString([]byte(sepSender[0]))
+		// must follow RFC 2047 to use UTF-8
+		source = "=?UTF-8?B?" + b64SenderName + "?= <" + sepSender[1]
 	}
 	_, err = svc.SendEmail(&ses.SendEmailInput{
 		Destination: &ses.Destination{
