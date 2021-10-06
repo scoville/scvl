@@ -190,9 +190,15 @@ func (c *awsClient) SendEmail(email *domain.Email, sender string) (err error) {
 
 // Todo: SendFileNameでも使えるようにする
 func (c *awsClient) sendEmail(svc *ses.SES, email *domain.Email, sender string) (err error) {
+	toAddresses := []*string{}
+	for _, email := range strings.Split(email.To, ",") {
+		if email != "" {
+			toAddresses = append(toAddresses, aws.String(strings.TrimSpace(email)))
+		}
+	}
 	_, err = svc.SendEmail(&ses.SendEmailInput{
 		Destination: &ses.Destination{
-			ToAddresses:  []*string{&email.To},
+			ToAddresses:  toAddresses,
 			BccAddresses: []*string{&sender},
 		},
 		Message: &ses.Message{
