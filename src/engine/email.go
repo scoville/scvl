@@ -41,7 +41,7 @@ func (e *Engine) SendEmail(req *CreateEmailRequest) (err error) {
 	}
 	go (func() {
 		for _, email := range emailTemplate.BatchEmail.Emails {
-			openConfirmationCode := fmt.Sprintf(`<img src="https://%s/%d/read">`, os.Getenv("EMAIL_DOMAIN"), email.ID)
+			openConfirmationCode := fmt.Sprintf(`<img style="width: 1px; height: 1px; display: none" src="https://%s/%d/read">`, os.Getenv("EMAIL_DOMAIN"), email.ID)
 			email.Body = email.Body + openConfirmationCode
 			err = e.awsClient.SendEmail(email, emailTemplate.BatchEmail.Sender)
 			if err != nil {
