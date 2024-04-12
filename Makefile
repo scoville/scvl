@@ -26,6 +26,12 @@ deploy:
 	scp -r bin css js templates scvl0002w:/home/ec2-user/scvl/
 	ssh scvl0002w "supervisorctl start scvl"
 
+deploy-assets:
+	scp -r css js templates scvl0001w:/home/ec2-user/scvl/
+	scp -r css js templates scvl0002w:/home/ec2-user/scvl/
+	ssh scvl0001w "supervisorctl restart scvl"
+	ssh scvl0002w "supervisorctl restart scvl"
+
 # Show help
 help:
 	@make2help $(MAKEFILE_LIST)

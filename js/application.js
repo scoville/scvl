@@ -1,79 +1,90 @@
-$(function () {
+document.addEventListener("DOMContentLoaded", function () {
   // data-confirm
-  $("[data-confirm]").on("click", function (e) {
-    if (!confirm($(e.target).data("confirm"))) {
-      e.preventDefault();
-      return false;
-    }
+  document.querySelectorAll("[data-confirm]").forEach(function (element) {
+    element.addEventListener("click", function (e) {
+      if (!confirm(e.target.getAttribute("data-confirm"))) {
+        e.preventDefault();
+        return false;
+      }
+    });
   });
 
-  if ($("#shortenUrl")[0]) {
-    $("#shortenUrl").val(location.origin + "/" + $("#shortenUrl").val());
+  if (document.getElementById("shortenUrl")) {
+    document.getElementById("shortenUrl").value = location.origin + "/" + document.getElementById("shortenUrl").value;
   }
-  $(".copy i").on("click", function () {
-    $(".copy-target").select();
-    document.execCommand("copy");
-    $(".copy .hint").css("visibility", "visible").text("コピー完了");
-    setTimeout(function () {
-      $(".copy .hint").css("visibility", "");
-    }, 3000);
-  });
+  const $copy = document.getElementById("copy");
+  if ($copy) {
+    $copy.addEventListener("click", function () {
+      const copyTarget = $copy.getAttribute("data-copy-target");
+      document.querySelector(copyTarget).select();
+      document.execCommand("copy");
+      $copy.querySelector(".hint").style.visibility = "visible";
+      $copy.querySelector(".hint").textContent = "コピー完了";
+    });
+  }
 
   // UTM
-  if ($("#url")[0]) {
-    var params = getParams($("#url").val());
+  if (document.getElementById("url")) {
+    var params = getParams(document.getElementById("url").value);
     if (params["utm_source"]) {
-      $('input[name="utm_source"]').val(params["utm_source"]);
+      document.querySelector('input[name="utm_source"]').value = params["utm_source"];
     }
     if (params["utm_medium"]) {
-      $('select[name="utm_medium"]').val(params["utm_medium"]);
+      document.querySelector('select[name="utm_medium"]').value = params["utm_medium"];
     }
     if (params["utm_campaign"]) {
-      $('input[name="utm_campaign"]').val(params["utm_campaign"]);
+      document.querySelector('input[name="utm_campaign"]').value = params["utm_campaign"];
     }
   }
-  if ($("#utm")[0] && $("#utm")[0].checked) {
-    $(".utm-information").show();
-  }
-  $("#utm").on("change", function () {
-    if (this.checked) {
-      $(".utm-information").show();
-    } else {
-      $(".utm-information").hide();
+  var utmCheckbox = document.getElementById("utm");
+  if (utmCheckbox) {
+    if (utmCheckbox.checked) {
+      document.getElementById("utm-fields").style.display = "block";
     }
-  });
-  $(
-    'input[name="url"],input[name="utm_source"],select[name="utm_medium"],input[name="utm_campaign"]'
-  ).on("change", function () {
-    buildURL();
+    utmCheckbox.addEventListener("change", function () {
+      if (this.checked) {
+        document.getElementById("utm-fields").style.display = "block";
+      } else {
+        document.getElementById("utm-fields").style.display = "none";
+      }
+    });
+  }
+  document.querySelectorAll('input[name="url"], input[name="utm_source"], select[name="utm_medium"], input[name="utm_campaign"]').forEach(function (element) {
+    element.addEventListener("change", buildURL);
   });
 
   // OGP
-  if ($("#ogp")[0] && $("#ogp")[0].checked) {
-    $(".ogp-information").show();
-  }
-  $("#ogp").on("change", function () {
-    if (this.checked) {
-      $(".ogp-information").show();
-      if ($('input.ogp[name="title"]').val() === "") {
-        fetchOGP();
-      }
-    } else {
-      $(".ogp-information").hide();
+  var ogpCheckbox = document.getElementById("ogp");
+  if (ogpCheckbox) {
+    if (ogpCheckbox.checked) {
+      document.getElementById("ogp-fields").style.display = "block";
     }
-  });
+    ogpCheckbox.addEventListener("change", function () {
+      if (this.checked) {
+        document.getElementById("ogp-fields").style.display = "block";
+        if (document.querySelector('input.ogp[name="title"]').value === "") {
+          fetchOGP();
+        }
+      } else {
+        document.getElementById("ogp-fields").style.display = "none";
+      }
+    });
+  }
 
   // Email
-  if ($("#email")[0] && $("#email")[0].checked) {
-    $(".email-information").show();
-  }
-  $("#email").on("change", function () {
-    if (this.checked) {
-      $(".email-information").show();
-    } else {
-      $(".email-information").hide();
+  var emailCheckbox = document.getElementById("email");
+  if (emailCheckbox) {
+    if (emailCheckbox.checked) {
+      document.getElementById("email-fields").style.display = "block";
     }
-  });
+    emailCheckbox.addEventListener("change", function () {
+      if (this.checked) {
+        document.getElementById("email-fields").style.display = "block";
+      } else {
+        document.getElementById("email-fields").style.display = "none";
+      }
+    });
+  }
 
   function getParams(url) {
     var params = {};
@@ -81,67 +92,71 @@ $(function () {
       return params;
     }
     var q = url.split("?")[1];
-    for (var i = 0; i < q.split("&").length; i++) {
-      var param = q.split("&")[i].split("=");
+    q.split("&").forEach(function (part) {
+      var param = part.split("=");
       if (param.length > 1) {
         params[param[0]] = param[1];
       }
-    }
+    });
     return params;
   }
 
   function buildURL() {
-    var url = $("#url").val();
+    var urlField = document.getElementById("url");
+    var url = urlField.value;
     if (url === "") {
       return;
     }
     var params = getParams(url);
-    var source = $('input[name="utm_source"]').val();
+    var source = document.querySelector('input[name="utm_source"]').value;
     if (source) {
       params["utm_source"] = source;
     }
-    var medium = $('select[name="utm_medium"]').val();
+    var medium = document.querySelector('select[name="utm_medium"]').value;
     if (medium === "-") {
       delete params["utm_medium"];
     } else if (medium) {
       params["utm_medium"] = medium;
     }
-    var campaign = $('input[name="utm_campaign"]').val();
+    var campaign = document.querySelector('input[name="utm_campaign"]').value;
     if (campaign) {
       params["utm_campaign"] = campaign;
     }
     url = url.split("?")[0];
     var values = [];
-    for (var i = 0; i < Object.keys(params).length; i++) {
-      var key = Object.keys(params)[i];
+    Object.keys(params).forEach(function (key) {
       var val = params[key];
       if (val !== "") {
         values.push(key + "=" + val);
       }
-    }
+    });
     if (values.length > 0) {
-      url = url + "?" + values.join("&");
+      url += "?" + values.join("&");
     }
-    $("#url").val(url);
+    urlField.value = url;
   }
 
   function fetchOGP() {
-    var url = $("#url").val();
+    var url = document.getElementById("url").value;
     if (url === "") {
       return;
     }
-    $("input.ogp").val("取得中...");
-    $("input.ogp").prop("disabled", true);
-    $.ajax({
-      type: "GET",
-      dataType: "json",
-      url: "https://ogp.en-courage.com?url=" + url,
-      success: function (data) {
-        $('input.ogp[name="title"]').val(data.title);
-        $('input.ogp[name="image"]').val(data.image);
-        $('input.ogp[name="description"]').val(data.description);
-        $("input.ogp").prop("disabled", false);
-      },
+    document.querySelectorAll("input.ogp").forEach(function (element) {
+      element.value = "取得中...";
+      element.disabled = true;
     });
+    var request = new XMLHttpRequest();
+    request.open("GET", "https://ogp.en-courage.com?url=" + url, true);
+    request.responseType = 'json';
+    request.onload = function () {
+      var data = request.response;
+      document.querySelector('input.ogp[name="title"]').value = data.title;
+      document.querySelector('input.ogp[name="image"]').value = data.image;
+      document.querySelector('input.ogp[name="description"]').value = data.description;
+      document.querySelectorAll("input.ogp").forEach(function (element) {
+        element.disabled = false;
+      });
+    };
+    request.send();
   }
 });

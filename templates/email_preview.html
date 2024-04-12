@@ -1,28 +1,40 @@
 {{define "body"}}
-<div class="email-preview">
+<div class="jumbotron">
   <h1>メールプレビュー</h1>
 
-  <p>
+  <p class="mb-4">
     下記のように、メールを{{.EmailTemplate.SendingNumber}}名に送信します。（最初の３件のみ表示）
   </p>
-  <p>メールタイトル</p>
-  <p>{{.EmailTemplate.Title}}</p>
-  <p></p>
 
-  <table class="table">
-    <tr>
-      <td>送信先</td>
-      <td>タイトル</td>
-      <td>送信文言</td>
-    </tr>
-    {{range .EmailTemplate.FilterEmailNum 3}}
-    <tr>
-      <td>{{.To}}</td>
-      <td>{{.Title}}</td>
-      <td>{{.Body | nl2br}}</td>
-    </tr>
-    {{end}}
-  </table>
+  <div class="mb-4 border border-gray-800 rounded-md overflow-hidden">
+    <table class="table">
+      <tr>
+        <th width="160">メールタイトル:</th>
+        <td>{{.EmailTemplate.Title}}</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="table-wrapper mb-4">
+    <table class="table">
+      <thead>
+        <tr>
+          <td>送信先</td>
+          <td>タイトル</td>
+          <td>送信文言</td>
+        </tr>
+      </thead>
+      <tbody>
+        {{range .EmailTemplate.FilterEmailNum 3}}
+        <tr>
+          <td>{{.To}}</td>
+          <td>{{.Title}}</td>
+          <td>{{.Body | nl2br}}</td>
+        </tr>
+        {{end}}
+      </tbody>
+    </table>
+  </div>
   <form
     action="{{if .IsEmailHost}}/send{{else}}/emails/send{{end}}"
     method="post"

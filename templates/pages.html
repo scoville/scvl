@@ -4,132 +4,176 @@
   {{if .LoginURL}}
     <a href="{{.LoginURL}}" class="login btn btn-primary btn-lg">ログイン</a>
   {{else}}
-    <p>URLの短縮ができます。</p>
-    <form action="/shorten" method="post">
-      <div class="form-inline">
-        <input id="url" type="url" name="url" value="{{.URL}}" class="form-control">
-        <input type="submit" value="送信" class="btn btn-primary">
-      </div>
-      <label class="toggle-utm">
-        <input id="utm" type="checkbox" name="utm">トラッキング用パラメータの追加
-      </label>
-      <div class="utm-information">
-        <div class="form-group">
-          <label for="utm_source">【必須】utm_source（媒体名）</label>
-          <input class="form-control" type="text" name="utm_source" value="" placeholder="google, facebook, line など">
-        </div>
-        <div class="form-group">
-          <label for="utm_medium">【必須】utm_medium（メディアの種類）</label>
-          <select class="form-control" name="utm_medium">
-            <option value="-"></option>
-            <option value="paidsearch">paidsearch（有料検索）</option>
-            <option value="display">display（ディスプレイ広告）</option>
-            <option value="affiliate">affiliate（その他の広告）</option>
-            <option value="social">social（SNS）</option>
-            <option value="email">email（メール）</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="utm_campaign">【任意】utm_campaign(キャンペーン名)</label>
-          <input class="form-control" type="text" name="utm_campaign" value="" placeholder="spring_sale など">
-        </div>
-      </div>
+  <p class="mb-1">URLの短縮ができます。</p>
+  <form action="/shorten" method="post" class="flex items-center mb-4 max-w-xl">
+    <input
+      id="url"
+      type="url"
+      name="url"
+      value="{{.URL}}"
+      class="form-control flex-1 mr-2"
+      placeholder="Enter your URL here"
+    />
+    <button type="submit" class="btn btn-primary">短縮する</button>
+  </form>
+  <div>
+    <label class="inline-flex items-center">
+      <input id="utm" type="checkbox" name="utm" class="text-blue-500 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50" />
+      <span class="ml-2">トラッキング用パラメータの追加</span>
+    </label>
+  </div>
+  <div id="utm-fields" class="space-y-3 hidden">
+    <div>
+      <label for="utm_source" class="block">【必須】utm_source（媒体名）</label>
+      <input
+        class="form-control"
+        type="text"
+        name="utm_source"
+        value=""
+        placeholder="google, facebook, line など"
+      />
+    </div>
+    <div class="mb-4">
+      <label for="utm_medium" class="block text-left">【必須】utm_medium（メディアの種類）</label>
+      <select class="form-control" name="utm_medium">
+        <option value="-"></option>
+        <option value="paidsearch">paidsearch（有料検索）</option>
+        <option value="display">display（ディスプレイ広告）</option>
+        <option value="affiliate">affiliate（その他の広告）</option>
+        <option value="social">social（SNS）</option>
+        <option value="email">email（メール）</option>
+      </select>
+    </div>
+    <div class="mb-4">
+      <label for="utm_campaign" class="block text-left">【任意】utm_campaign(キャンペーン名)</label>
+      <input
+        class="form-control"
+        type="text"
+        name="utm_campaign"
+        value=""
+        placeholder="spring_sale など"
+      />
+    </div>
+  </div>
 
-      <label class="toggle-ogp">
-        <input id="ogp" type="checkbox" name="ogp">OGPをカスタマイズ
-      </label>
-      <div class="ogp-information">
-        <div class="form-group">
-          <label for="title">タイトル</label>
-          <input class="ogp form-control" type="text" name="title" value="">
-        </div>
-        <div class="form-group">
-          <label for="title">画像URL</label>
-          <input class="ogp form-control" type="url" name="image" value="">
-        </div>
-        <div class="form-group">
-          <label for="title">説明文</label>
-          <input class="ogp form-control" type="text" name="description" value="">
-        </div>
-      </div>
-    </form>
+  <div>
+    <label class="inline-flex items-center">
+      <input id="ogp" type="checkbox" name="ogp" class="text-blue-500 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50" />
+      <span class="ml-2">OGPをカスタマイズ</span>
+    </label>
+  </div>
+
+  <div id="ogp-fields" class="space-y-3 hidden">
+    <div class="mb-4">
+      <label for="title" class="block text-left">タイトル</label>
+      <input class="form-control" type="text" name="title" value="" />
+    </div>
+    <div class="mb-4">
+      <label for="title" class="block text-left">画像URL</label>
+      <input class="form-control" type="url" name="image" value="" />
+    </div>
+    <div class="mb-4">
+      <label for="title" class="block text-left">説明文</label>
+      <input
+        class="form-control"
+        type="text"
+        name="description"
+        value=""
+      />
+    </div>
+  </div>
+  </form>
   {{end}}
 
   {{if .URL}}
-    <div class="panel panel-success">
-      <div class="panel-heading">
-        <h3 class="panel-title">短縮が成功しました。</h3>
-      </div>
-      <div class="panel-body">
-        <p>短縮結果:</p>
-        <p>
-          <input id="shortenUrl" class="copy-target" type="text" value="{{.Slug}}" readonly>
-          <span class="copy">
-            <i class="material-icons">content_copy</i>
-            <span class="hint">コピーする</span>
-          </span>
-        </p>
+    <div class="mt-8 p-4 bg-green-200 rounded-md">
+      <h3 class="text-2xl font-semibold mb-3">短縮が成功しました。</h3>
+      <p class="mb-3">短縮結果:</p>
+      <div class="flex items-center justify-center max-w-lg">
+        <input
+          id="shortenUrl"
+          class="flex-1 form-control"
+          type="text"
+          value="{{.Slug}}"
+          readonly
+        />
+        <div id="copy" data-copy-target="#shortenUrl" class="ml-4 px-4 py-2 bg-yellow-400 text-gray-800 rounded hover:bg-yellow-500 hover:cursor-pointer">
+          <i class="fa fa-copy"></i>
+          <span class="hint">コピーする</span>
+        </div>
       </div>
     </div>
   {{end}}
 </div>
 
 {{if .User}}
-  <h2>{{.User.Name}}の短縮したURL一覧</h2>
-  <form class="form-inline" action="/pages" method="get">
-    <div class="form-group mb-2 mx-sm-3">
-      <label class="sr-only" for="q">短縮URL</label>
-      <input class="form-control" name="q" value="{{.Query}}" type="search" placeholder="/3n0fy">
-    </div>
-    <button type="submit" class="btn btn-secondary mb-2"> 短縮URLで検索</button>
-  </form>
-  {{if eq .Count 0}}
+  <div class="pb-2">
+    <h2>{{.User.Name}}の短縮したURL一覧</h2>
+    <form action="/pages" method="get" class="flex items-center mb-4 max-w-lg">
+      <input
+        class="form-control flex-1 mr-2"
+        name="q"
+        value="{{.Query}}"
+        type="search"
+        placeholder="Search shortened URL"
+      />
+      <button type="submit" class="btn btn-default">短縮URLで検索</button>
+    </form>
+    {{if eq .Count 0}}
     <p>短縮したURLが見つかりませんでした。</p>
-  {{else}}
+    {{else}}
     <p>全{{.Count}}件中、{{.Start}}〜{{.End}}を表示中</p>
-    <table class="table urls">
-      <tr>
-        <th width="80">短縮URL</th>
-        <th>リダイレクト先URL</th>
-        <th width="100">QRコード</th>
-        <th width="100">クリック数</th>
-        <th width="100">編集</th>
-        <th width="100">削除</th>
-      </tr>
-      {{range .Pages}}
+    {{end}}
+  </div>
+  <div class="table-wrapper">
+    <table>
+      <thead>
         <tr>
-          <td><a href="/{{.Slug}}" target="_blank">/{{.Slug}}</a></td>
-          <td>
-            <div class="truncate">
-              <a href="{{.URL}}" target="_blank">
-                {{.URL}}
-              </a>
-            </div>
-            <div class="truncate mt10">{{.Title}}</div>
-          </td>
-          <td class="qr">
-            <a href="/{{.Slug}}/qr.png" target="_blank">
-              <img src="/{{.Slug}}/qr.png">
-            </a>
-          </td>
-          <td>{{.ViewCount}}</td>
-          <td>
-            <a href="/{{.Slug}}/edit" class="btn btn-default">編集</a>
-          </td>
-          <td>
-            <form action="/{{.Slug}}/destroy" method="post">
-              <button class="btn btn-danger" data-confirm="本当に削除して宜しいですか？">削除</button>
-            </form>
-          </td>
+          <th>短縮URL</th>
+          <th>リダイレクト先URL</th>
+          <th>QRコード</th>
+          <th>クリック数</th>
+          <th>編集</th>
+          <th>削除</th>
         </tr>
-      {{end}}
+      </thead>
+      <tbody>
+        {{range .Pages}}
+          <tr>
+            <td><a href="/{{.Slug}}" target="_blank" class="text-blue-600 hover:underline">/{{.Slug}}</a></td>
+            <td>
+              <div class="truncate" style="max-width: 260px;">
+                <a href="{{.URL}}" target="_blank" class="text-blue-600 hover:underline">{{.URL}}</a>
+                <div class="text-gray-600 text-sm truncate">{{.Title}}</div>
+              </div>
+            </td>
+            <td>
+              <a href="/{{.Slug}}/qr.png" target="_blank">
+                <img src="/{{.Slug}}/qr.png" alt="QR Code" class="h-20">
+              </a>
+            </td>
+            <td>{{.ViewCount}}</td>
+            <td>
+              <a href="/{{.Slug}}/edit" class="btn btn-default">編集</a>
+            </td>
+            <td>
+              <form action="/{{.Slug}}/destroy" method="post" onsubmit="return confirm('本当に削除して宜しいですか？');">
+                <button type="submit" class="btn btn-danger">削除</button>
+              </form>
+            </td>
+          </tr>
+        {{end}}
+      </tbody>
     </table>
+  </div>
+  
+  <div class="mt-4 flex justify-between">
     {{if .PrevURL}}
-      <a href="{{.PrevURL}}" class="btn btn-default">前のページへ</a>
+      <a href="{{.PrevURL}}" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">前のページへ</a>
     {{end}}
     {{if .NextURL}}
-      <a href="{{.NextURL}}" class="btn btn-default">次のページへ</a>
+      <a href="{{.NextURL}}" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">次のページへ</a>
     {{end}}
-  {{end}}
+  </div>
 {{end}}
 {{end}}

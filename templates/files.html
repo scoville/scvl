@@ -6,7 +6,7 @@
   {{else}}
   <p>ファイルのアップロードができます。</p>
   <form action="/" method="post" enctype="multipart/form-data">
-    <div class="form-group">
+    <div class="mb-4">
       <label for="download_limit"
         >ダウンロード制限回数（無制限の場合は0を指定）</label
       >
@@ -18,7 +18,7 @@
         required
       />
     </div>
-    <div class="form-group">
+    <div class="mb-4">
       <label for="valid_days"
         >ダウンロード可能日数（無期限の場合は0を指定）</label
       >
@@ -30,17 +30,17 @@
         required
       />
     </div>
-    <div class="form-group">
+    <div class="mb-4">
       <label for="password">パスワード（任意）</label>
       <input type="password" name="password" value="" class="form-control" />
     </div>
     <input type="file" name="file" required />
     <p style="font-size: 12px">※ ファイルサイズの上限は50MBです。</p>
-    <label class="toggle-email mt20">
+    <label class="toggle-email mt-4">
       <input id="email" type="checkbox" name="email" />メールを送信する
     </label>
-    <div class="email-information">
-      <div class="form-group">
+    <div id="email-fields" class="space-y-3 hidden">
+      <div class="mb-4">
         <label for="receiver_address">送信先メールアドレス</label>
         <input
           type="email"
@@ -51,7 +51,7 @@
           multiple
         />
       </div>
-      <div class="form-group">
+      <div class="mb-4">
         <label for="receiver_name">宛名</label>
         <input
           type="text"
@@ -61,7 +61,7 @@
           placeholder="山田 太郎"
         />
       </div>
-      <div class="form-group">
+      <div class="mb-4">
         <label for="sender_name">送信者名</label>
         <input
           type="text"
@@ -70,7 +70,7 @@
           class="form-control"
         />
       </div>
-      <div class="form-group">
+      <div class="mb-4">
         <label for="bcc_address">BCCアドレス(任意)</label>
         <input
           type="email"
@@ -80,7 +80,7 @@
           multiple
         />
       </div>
-      <div class="form-group">
+      <div class="mb-4">
         <label for="message">フリーメッセージ</label>
         <textarea name="message" class="form-control"></textarea>
       </div>
@@ -91,37 +91,39 @@
         />パスワードを別のメールで自動送信する
       </label>
     </div>
-    <label class="mt20">
+    <label class="mt-4">
       <input
         id="direct_download"
         type="checkbox"
         name="direct_download"
       />ダウンロードページをスキップ
     </label>
-    <div class="mt20">
+    <div class="mt-4">
       <input type="submit" value="送信" class="btn btn-primary" />
     </div>
   </form>
   {{end}} {{if .Slug}}
-  <div class="panel panel-success">
-    <div class="panel-heading">
-      <h3 class="panel-title">ファイルのアップロードが成功しました。</h3>
-    </div>
-    <div class="panel-body">
-      <p>ダウンロード用リンク:</p>
-      <p>
-        <input
-          id="shortenUrl"
-          class="copy-target"
-          type="text"
-          value="{{.Slug}}"
-          readonly
-        />
-        <span class="copy">
-          <i class="material-icons">content_copy</i>
-          <span class="hint">コピーする</span>
-        </span>
-      </p>
+  <div class="mt-8 p-4 bg-green-200 rounded-md">
+    <h3 class="text-2xl font-semibold mb-3">
+      ファイルのアップロードが成功しました。
+    </h3>
+    <p class="mb-3">ダウンロード用リンク:</p>
+    <div class="flex items-center justify-center max-w-lg">
+      <input
+        id="shortenUrl"
+        class="flex-1 form-control"
+        type="text"
+        value="{{.Slug}}"
+        readonly
+      />
+      <div
+        id="copy"
+        data-copy-target="#shortenUrl"
+        class="ml-4 px-4 py-2 bg-yellow-400 text-gray-800 rounded hover:bg-yellow-500 hover:cursor-pointer"
+      >
+        <i class="fa fa-copy"></i>
+        <span class="hint">コピーする</span>
+      </div>
     </div>
   </div>
   {{end}}
@@ -129,39 +131,52 @@
 
 {{if .User}}
 <h2>{{.User.Name}}のアップロードしたファイル一覧</h2>
-<table class="table files">
-  <tr>
-    <th>ファイル名</th>
-    <th width="140">ダウンロード用リンク</th>
-    <th width="134">ダウンロード回数 / 制限回数</th>
-    <th width="100">期限</th>
-    <th width="100">編集</th>
-    <th width="100">削除</th>
-  </tr>
-  {{$fileHost := .FileHost}} {{range .User.Files}}
-  <tr>
-    <td class="truncate">{{.Name}}</td>
-    <td class="truncate">
-      <a href="/{{.Slug}}" target="_blank">/{{.Slug}}</a>
-    </td>
-    <td>
-      {{.DownloadCount}}{{if ne .DownloadLimit 0}} / {{.DownloadLimit}}{{end}}
-    </td>
-    <td>{{.FormatDeadline}}</td>
-    <td>
-      <a href="{{$fileHost}}/{{.Slug}}/edit" class="btn btn-default">編集</a>
-    </td>
-    <td>
-      <form action="{{$fileHost}}/{{.Slug}}/destroy" method="post">
-        <button
-          class="btn btn-danger"
-          data-confirm="本当に削除して宜しいですか？"
-        >
-          削除
-        </button>
-      </form>
-    </td>
-  </tr>
-  {{end}}
-</table>
+<div class="table-wrapper">
+  <table class="files">
+    <thead>
+      <tr>
+        <th>ファイル名</th>
+        <th width="140">ダウンロード用リンク</th>
+        <th width="156">ダウンロード回数 / 制限回数</th>
+        <th width="100">期限</th>
+        <th width="100">編集</th>
+        <th width="100">削除</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{$fileHost := .FileHost}} {{range .User.Files}}
+      <tr>
+        <td>
+          <div class="truncate" style="max-width: 260px">{{.Name}}</div>
+        </td>
+        <td>
+          <div class="truncate" style="max-width: 260px">
+            <a href="/{{.Slug}}" target="_blank">/{{.Slug}}</a>
+          </div>
+        </td>
+        <td>
+          {{.DownloadCount}}{{if ne .DownloadLimit 0}} /
+          {{.DownloadLimit}}{{end}}
+        </td>
+        <td>{{.FormatDeadline}}</td>
+        <td>
+          <a href="{{$fileHost}}/{{.Slug}}/edit" class="btn btn-default"
+            >編集</a
+          >
+        </td>
+        <td>
+          <form action="{{$fileHost}}/{{.Slug}}/destroy" method="post">
+            <button
+              class="btn btn-danger"
+              data-confirm="本当に削除して宜しいですか？"
+            >
+              削除
+            </button>
+          </form>
+        </td>
+      </tr>
+      {{end}}
+    </tbody>
+  </table>
+</div>
 {{end}} {{end}}
