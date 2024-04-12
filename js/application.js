@@ -1,5 +1,4 @@
 $(function () {
-  console.log("a");
   // data-confirm
   $("[data-confirm]").on("click", function (e) {
     if (!confirm($(e.target).data("confirm"))) {
