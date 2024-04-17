@@ -19,15 +19,17 @@
     <table class="table">
       <thead>
         <tr>
-          <td>送信先</td>
-          <td>タイトル</td>
-          <td>送信文言</td>
+          <th width="280">送信先</th>
+          <th>タイトル</th>
+          <th>送信文言</th>
         </tr>
       </thead>
       <tbody>
         {{range .EmailTemplate.FilterEmailNum 3}}
         <tr>
-          <td>{{.To}}</td>
+          <td>
+            <div class="break-all">{{.To}}</div>
+          </td>
           <td>{{.Title}}</td>
           <td>{{.Body | nl2br}}</td>
         </tr>
