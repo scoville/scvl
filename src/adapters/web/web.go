@@ -1,6 +1,7 @@
 package web
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/gorilla/context"
@@ -28,6 +29,14 @@ func New(e *engine.Engine, sessionSecret, mainDomain string) *Web {
 	}
 	w.store.Options.Domain = mainDomain
 	return w
+}
+
+func logger(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			// リクエストのURLをログに出力
+			log.Printf("Received request: %s %s", r.Method, r.URL.String())
+			next.ServeHTTP(w, r)
+	})
 }
 
 // Start starts listen and serve
@@ -64,7 +73,8 @@ func (web *Web) Start(port string) error {
 	r.HandleFunc("/oauth/google/callback", web.oauthCallbackHandler).Methods(http.MethodGet)
 	http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("css/"))))
 	http.Handle("/js/", http.StripPrefix("/js/", http.FileServer(http.Dir("js/"))))
-	http.Handle("/", r)
+	loggedRouter := logger(r)
+	http.Handle("/", loggedRouter)
 	return http.ListenAndServe(port, nil)
 }
 

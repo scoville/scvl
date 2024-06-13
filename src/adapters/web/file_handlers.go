@@ -10,6 +10,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/go-playground/form"
 	"github.com/gorilla/context"
 	"github.com/gorilla/mux"
 	"github.com/scoville/scvl/src/domain"
@@ -28,6 +29,50 @@ func (web *Web) filesHandler(w http.ResponseWriter, r *http.Request) {
 		resp["User"] = user
 		resp["SenderName"] = user.Name
 		resp["BCCAddress"] = user.Email
+		var req engine.FindFilesRequest
+		err := form.NewDecoder().Decode(&req, r.URL.Query())
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		req.UserID = user.ID
+		files, count, err := web.engine.FindFiles(&req)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		resp["Files"] = files
+		resp["Count"] = count
+		start := req.Offset + 1
+		if start < 1 {
+			start = 1
+		}
+		resp["Start"] = start
+		end := req.Offset + req.Limit
+		if end > uint(count) {
+			end = uint(count)
+		}
+		resp["End"] = end
+		q := ""
+		if req.Query != "" {
+			q += "&q=" + req.Query
+			resp["Query"] = req.Query
+		}
+
+		if req.Offset > 0 {
+			prevOffset := int(req.Offset) - int(req.Limit)
+			if prevOffset < 0 {
+				prevOffset = 0
+			}
+			resp["PrevURL"] = fmt.Sprintf("/?offset=%d&limit=%d", prevOffset, req.Limit) + q
+
+		}
+		if req.Offset+req.Limit < uint(count) {
+			nextOffset := req.Offset + req.Limit
+			resp["NextURL"] = fmt.Sprintf("/?offset=%d&limit=%d", nextOffset, req.Limit) + q
+		}
+	} else {
+		resp["Files"] = make([]*domain.File, 0)
 	}
 	loginURL, ok := context.Get(r, "login_url").(string)
 	if ok {

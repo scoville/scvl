@@ -130,7 +130,28 @@
 </div>
 
 {{if .User}}
-<h2>{{.User.Name}}のアップロードしたファイル一覧</h2>
+<div class="pb-2">
+  <h2>{{.User.Name}}のアップロードしたファイル一覧</h2>
+  <form
+    action="{{.FileHost}}"
+    method="get"
+    class="flex items-center mb-4 max-w-lg"
+  >
+    <input
+      class="form-control flex-1 mr-2"
+      name="q"
+      value="{{.Query}}"
+      type="search"
+      placeholder="Search file"
+    />
+    <button type="submit" class="btn btn-default">ファイル名で検索</button>
+  </form>
+  {{if eq .Count 0}}
+  <p>ファイルが見つかりませんでした。</p>
+  {{else}}
+  <p>全{{.Count}}件中、{{.Start}}〜{{.End}}を表示中</p>
+  {{end}}
+</div>
 <div class="table-wrapper">
   <table class="files">
     <thead>
@@ -144,7 +165,7 @@
       </tr>
     </thead>
     <tbody>
-      {{$fileHost := .FileHost}} {{range .User.Files}}
+      {{$fileHost := .FileHost}} {{range .Files}}
       <tr>
         <td>
           <div class="truncate" style="max-width: 260px">{{.Name}}</div>
@@ -178,5 +199,20 @@
       {{end}}
     </tbody>
   </table>
+</div>
+<div class="mt-4 flex justify-between">
+  {{if .PrevURL}}
+  <a
+    href="{{.PrevURL}}"
+    class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+    >前のページへ</a
+  >
+  {{end}} {{if .NextURL}}
+  <a
+    href="{{.NextURL}}"
+    class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+    >次のページへ</a
+  >
+  {{end}}
 </div>
 {{end}} {{end}}

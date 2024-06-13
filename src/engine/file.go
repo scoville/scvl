@@ -12,6 +12,22 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+// FindFilesRequest is the request struct for FindFiles()
+type FindFilesRequest struct {
+	Query  string `form:"q"`
+	Limit  uint   `form:"limit"`
+	Offset uint   `form:"offset"`
+	UserID uint   `form:"-"`
+}
+
+// FindFiles returns the pages
+func (e *Engine) FindFiles(req *FindFilesRequest) (pages []*domain.File, count int, err error) {
+	if req.Limit == 0 {
+		req.Limit = 20
+	}
+	return e.sqlClient.FindFiles(req)
+}
+
 // FindFile fetches a file
 func (e *Engine) FindFile(slug string, userID int) (file *domain.File, err error) {
 	file, err = e.sqlClient.FindFileBySlug(slug)

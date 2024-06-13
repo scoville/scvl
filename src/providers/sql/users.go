@@ -16,18 +16,12 @@ func (c *client) FindUser(id uint) (user *domain.User, err error) {
 				Order("email_templates.created_at DESC").
 				Preload("BatchEmail")
 		}).
-		Preload("Files", func(db *gorm.DB) *gorm.DB {
-			return db.Where("status = ?", domain.FileStatusActive).Order("files.created_at DESC")
-		}).
 		Preload("Images", func(db *gorm.DB) *gorm.DB {
 			return db.Order("images.created_at DESC")
 		}).
 		First(user, id).Error
 	if err != nil {
 		return
-	}
-	for _, f := range user.Files {
-		c.db.Table(tblFileDownloads).Where("file_id = ?", f.ID).Count(&(f.DownloadCount))
 	}
 
 	return

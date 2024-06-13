@@ -23,6 +23,7 @@ type SQLClient interface {
 	UpdateOGP(uint, *domain.OGP) error
 	DeleteOGP(uint) error
 
+	FindFiles(params *FindFilesRequest) (pages []*domain.File, count int, err error)
 	FindFileBySlug(string) (*domain.File, error)
 	CreateFile(*domain.File) error
 	UpdateFile(*domain.File, *domain.File) error
